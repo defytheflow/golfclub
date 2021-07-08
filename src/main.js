@@ -1,5 +1,5 @@
-const { app, BrowserWindow, nativeImage } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const db = require('./db');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -7,17 +7,17 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const createWindow = () => {
-  // const icon = nativeImage.createFromPath(path.join(__dirname, 'icon.png'));
+let mainWindow;
 
+const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 600,
-    // icon,
+    webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    },
   });
-
-  // mainWindow.setIcon(path.join(__dirname, 'icon.png'));
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -50,3 +50,25 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+ipcMain.on('toMain', async (event, { type, payload }) => {
+  switch (type) {
+    case 'find': {
+      const data = await db.find({}).sort({ createdAt: 1 });
+      mainWindow.webContents.send('fromMain', { payload: data });
+      break;
+    }
+    case 'insert': {
+      const res = await db.insert(payload);
+      mainWindow.webContents.send('fromMain', { type: 'insert', payload: res });
+      break;
+    }
+    case 'remove': {
+      await db.remove(payload);
+      break;
+    }
+    case 'update': {
+      await db.update({ _id: payload._id }, payload.data);
+      break;
+    }
+  }
+});

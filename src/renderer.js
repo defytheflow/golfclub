@@ -27,4 +27,4 @@
  */
 
 import './index.css';
-import './App.jsx';
+import './app.jsx';

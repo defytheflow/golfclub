@@ -14,24 +14,95 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Tooltip from '@material-ui/core/Tooltip';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+
+const genders = [
+  {
+    label: 'Муж.',
+    value: 'Муж.',
+  },
+  {
+    label: 'Жен.',
+    value: 'Жен.',
+  },
+];
 
 function App() {
-  const [rows, setRows] = React.useState([
-    createData('RU000873', 'Абахов Олег Евгеньевич ', 'Муж.', '15,2', '10'),
-    createData('RU003775', 'Абрамов Кирилл Александрович ', 'Муж.', '25,3', '20'),
-    createData('RU006019', 'Аброчнов Сергей Александрович ', 'Муж.', '38,9', '30'),
-    createData('RU004852', 'Авдеева Наталия Витальевна ', 'Жен.', '21,1', '15'),
-    createData('RU004215', 'Акаева Сайкал Эдильбековна ', 'Жен.', '28,5', '25'),
-    createData('RU003776', 'Акимжанова Дана Талгатовна ', 'Жен.', '18,9', '100'),
-    createData('RU006431', 'Акопян Ирина Рафаэловна ', 'Жен.', '38,4', '89'),
-    createData('RU006713', 'Алексеев Николай Константинович ', 'Муж.', '53,5', '45'),
-  ]);
+  const [rows, setRows] = React.useState([]);
+
+  React.useEffect(() => {
+    window.api.send('toMain', { type: 'find' });
+    window.api.receive('fromMain', ({ type, payload }) => {
+      if (type === 'insert') {
+        setRows(prevRows => [...prevRows, payload]);
+      } else {
+        setRows(payload);
+      }
+    });
+  }, []);
+
+  function refreshAllRows() {
+    console.log('Refreshing all');
+  }
+
+  function refreshRow(rowIndex) {
+    console.log(`Refreshing ${rowIndex}`);
+  }
+
+  function addRow() {
+    const newRow = createData(null, null, null, null, null);
+    window.api.send('toMain', { type: 'insert', payload: newRow });
+  }
+
+  function deleteRow(rowID) {
+    window.api.send('toMain', { type: 'remove', payload: { _id: rowID } });
+    setRows(prevRows => prevRows.filter(row => row._id !== rowID));
+  }
+
+  function handleBlur(e, rowID) {
+    const { name, value } = e.target;
+    const updatedRow = rows.find(row => row._id === rowID);
+    if (value) {
+      window.api.send('toMain', {
+        type: 'update',
+        payload: { _id: rowID, data: { ...updatedRow, [name]: value } },
+      });
+      updateRow(rowID, name, value);
+    }
+  }
+
+  function handleChange(e, rowID) {
+    const { value } = e.target;
+    const updatedRow = rows.find(row => row._id === rowID);
+    if (value) {
+      window.api.send('toMain', {
+        type: 'update',
+        payload: { _id: rowID, data: { ...updatedRow, gender: value } },
+      });
+      updateRow(rowID, 'gender', value);
+    }
+  }
+
+  function updateRow(rowID, field, value) {
+    setRows(prevRows => {
+      const newRows = prevRows.slice();
+      const updatedRow = newRows.find(row => row._id === rowID);
+      updatedRow[field] = value;
+      return newRows;
+    });
+  }
 
   return (
     <div>
       <ButtonGroup color='primary' variant='outlined' style={{ cssFloat: 'right' }}>
-        <Button startIcon={<AddIcon />}>Добавить</Button>
-        <Button startIcon={<RefreshIcon />}>Обновить</Button>
+        <Button startIcon={<AddIcon />} onClick={addRow}>
+          Добавить
+        </Button>
+        <Button startIcon={<RefreshIcon />} onClick={refreshAllRows}>
+          Обновить
+        </Button>
       </ButtonGroup>
       <br />
       <br />
@@ -41,7 +112,7 @@ function App() {
           <TableHead>
             <TableRow>
               <TableCell align='center'>№</TableCell>
-              <TableCell align='center'>Фамилия, Имя, Отчество</TableCell>
+              <TableCell align='left'>Фамилия, Имя, Отчество</TableCell>
               <TableCell align='center'>Пол</TableCell>
               <TableCell align='center'>HI</TableCell>
               <TableCell align='center'>%</TableCell>
@@ -51,15 +122,61 @@ function App() {
             {rows.map((row, i) => (
               <TableRow key={i}>
                 <TableCell component='th' scope='row'>
-                  {row.number}
+                  {row.number ?? (
+                    <TextField
+                      name='number'
+                      style={{ width: 50 }}
+                      onBlur={e => handleBlur(e, row._id)}
+                    />
+                  )}
                 </TableCell>
-                <TableCell align='left'>{row.name}</TableCell>
-                <TableCell align='right'>{row.gender}</TableCell>
-                <TableCell align='right'>{row.hi}</TableCell>
-                <TableCell align='right'>{row.percent}</TableCell>
+                <TableCell align='left' onClick={() => console.log('click')}>
+                  {row.name ?? (
+                    <TextField
+                      name='name'
+                      autoFocus
+                      onBlur={e => handleBlur(e, row._id)}
+                    />
+                  )}
+                </TableCell>
+                <TableCell align='right'>
+                  {row.gender ?? (
+                    <TextField
+                      id='standard-select-currency'
+                      select
+                      style={{ width: 50 }}
+                      onChange={e => handleChange(e, row._id)}>
+                      {genders.map(option => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                </TableCell>
+                <TableCell align='right'>
+                  {row.hi ?? (
+                    <TextField
+                      name='hi'
+                      type='number'
+                      style={{ width: 50 }}
+                      onBlur={e => handleBlur(e, row._id)}
+                    />
+                  )}
+                </TableCell>
+                <TableCell align='right'>
+                  {row.percent ?? (
+                    <TextField
+                      name='percent'
+                      type='number'
+                      style={{ width: 50 }}
+                      onBlur={e => handleBlur(e, row._id)}
+                    />
+                  )}
+                </TableCell>
                 <TableCell>
-                  <Refresh />
-                  <Delete />
+                  <Refresh onClick={() => refreshRow(i)} />
+                  <Delete onClick={() => deleteRow(row._id)} />
                 </TableCell>
               </TableRow>
             ))}
@@ -70,19 +187,31 @@ function App() {
   );
 }
 
-function Refresh() {
+function Refresh({ onClick }) {
   return (
-    <IconButton color='primary' aria-label='refresh' component='button'>
-      <RefreshIcon />
-    </IconButton>
+    <Tooltip title='Обновить'>
+      <IconButton
+        color='primary'
+        aria-label='refresh'
+        component='button'
+        onClick={onClick}>
+        <RefreshIcon />
+      </IconButton>
+    </Tooltip>
   );
 }
 
-function Delete() {
+function Delete({ onClick }) {
   return (
-    <IconButton color='secondary' aria-label='delete' component='button'>
-      <DeleteIcon />
-    </IconButton>
+    <Tooltip title='Удалить'>
+      <IconButton
+        color='secondary'
+        aria-label='delete'
+        component='button'
+        onClick={onClick}>
+        <DeleteIcon />
+      </IconButton>
+    </Tooltip>
   );
 }
 
