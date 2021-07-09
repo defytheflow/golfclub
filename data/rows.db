@@ -1,109 +1,198 @@
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"0DWDxoIXSf8rUqFb","createdAt":{"$$date":1625760795127},"updatedAt":{"$$date":1625760795127}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"CqJW0m8m4u2RnfnA","createdAt":{"$$date":1625760796113},"updatedAt":{"$$date":1625760796113}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"juLODd5CeP5DIU2I","createdAt":{"$$date":1625760796716},"updatedAt":{"$$date":1625760796716}}
-{"name":"JOhn","_id":"0DWDxoIXSf8rUqFb","createdAt":{"$$date":1625760795127},"updatedAt":{"$$date":1625760800063}}
-{"$$deleted":true,"_id":"CqJW0m8m4u2RnfnA"}
-{"$$deleted":true,"_id":"juLODd5CeP5DIU2I"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"djedLdkvwTEzXJ95","createdAt":{"$$date":1625760824773},"updatedAt":{"$$date":1625760824773}}
-{"name":"Hi","_id":"djedLdkvwTEzXJ95","createdAt":{"$$date":1625760824773},"updatedAt":{"$$date":1625760827357}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"e3gPFoMHOlZKGiPP","createdAt":{"$$date":1625760828394},"updatedAt":{"$$date":1625760828394}}
-{"name":"Hello","_id":"e3gPFoMHOlZKGiPP","createdAt":{"$$date":1625760828394},"updatedAt":{"$$date":1625760831031}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"BpVfdAFFPY8ptVGN","createdAt":{"$$date":1625760833912},"updatedAt":{"$$date":1625760833912}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"RJdUwGlpq25E7m4o","createdAt":{"$$date":1625760834154},"updatedAt":{"$$date":1625760834154}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"aInzJtJeGsCiv79q","createdAt":{"$$date":1625760834398},"updatedAt":{"$$date":1625760834398}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"fMp5gijOxXc73nXY","createdAt":{"$$date":1625760836982},"updatedAt":{"$$date":1625760836982}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"W5Aa508AqidFVDn7","createdAt":{"$$date":1625760837128},"updatedAt":{"$$date":1625760837128}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"WR5oUFHetEXGhVOy","createdAt":{"$$date":1625760837293},"updatedAt":{"$$date":1625760837293}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"21XeIcAylrMcUgqg","createdAt":{"$$date":1625760837485},"updatedAt":{"$$date":1625760837485}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"XkogifymSxzhc239","createdAt":{"$$date":1625760838495},"updatedAt":{"$$date":1625760838495}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"mM1PHeWcPY0hR7hs","createdAt":{"$$date":1625760838641},"updatedAt":{"$$date":1625760838641}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"7dc2DTaIZvYDcNRx","createdAt":{"$$date":1625760838807},"updatedAt":{"$$date":1625760838807}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"s4qPeDUAn0aD6j3a","createdAt":{"$$date":1625760838926},"updatedAt":{"$$date":1625760838926}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"UxsLCuDluj68HzlO","createdAt":{"$$date":1625760839744},"updatedAt":{"$$date":1625760839744}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"RxQYvwxlIHUd0ij7","createdAt":{"$$date":1625760839884},"updatedAt":{"$$date":1625760839884}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"9XCgtSbZ8RafvLOJ","createdAt":{"$$date":1625760840078},"updatedAt":{"$$date":1625760840078}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Avex9LsJ9Or9Y6UD","createdAt":{"$$date":1625760840795},"updatedAt":{"$$date":1625760840795}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"vNTdHNsFOuP2QpLc","createdAt":{"$$date":1625760840964},"updatedAt":{"$$date":1625760840964}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"ifbbP1WRKDF3BOul","createdAt":{"$$date":1625760841731},"updatedAt":{"$$date":1625760841731}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"24gIeBEyL6p7m8Kt","createdAt":{"$$date":1625760841949},"updatedAt":{"$$date":1625760841949}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"WFGRFIy5ONXXiSja","createdAt":{"$$date":1625760842742},"updatedAt":{"$$date":1625760842742}}
-{"$$deleted":true,"_id":"BpVfdAFFPY8ptVGN"}
-{"$$deleted":true,"_id":"RJdUwGlpq25E7m4o"}
-{"$$deleted":true,"_id":"aInzJtJeGsCiv79q"}
-{"$$deleted":true,"_id":"fMp5gijOxXc73nXY"}
-{"$$deleted":true,"_id":"W5Aa508AqidFVDn7"}
-{"$$deleted":true,"_id":"WR5oUFHetEXGhVOy"}
-{"$$deleted":true,"_id":"21XeIcAylrMcUgqg"}
-{"$$deleted":true,"_id":"XkogifymSxzhc239"}
-{"$$deleted":true,"_id":"mM1PHeWcPY0hR7hs"}
-{"$$deleted":true,"_id":"7dc2DTaIZvYDcNRx"}
-{"$$deleted":true,"_id":"s4qPeDUAn0aD6j3a"}
-{"$$deleted":true,"_id":"UxsLCuDluj68HzlO"}
-{"$$deleted":true,"_id":"RxQYvwxlIHUd0ij7"}
-{"$$deleted":true,"_id":"9XCgtSbZ8RafvLOJ"}
-{"$$deleted":true,"_id":"Avex9LsJ9Or9Y6UD"}
-{"$$deleted":true,"_id":"vNTdHNsFOuP2QpLc"}
-{"$$deleted":true,"_id":"ifbbP1WRKDF3BOul"}
-{"$$deleted":true,"_id":"24gIeBEyL6p7m8Kt"}
-{"$$deleted":true,"_id":"WFGRFIy5ONXXiSja"}
-{"$$deleted":true,"_id":"e3gPFoMHOlZKGiPP"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"2y3VRGaad29LGACX","createdAt":{"$$date":1625760873822},"updatedAt":{"$$date":1625760873822}}
-{"$$deleted":true,"_id":"2y3VRGaad29LGACX"}
-{"gender":"Муж.","_id":"djedLdkvwTEzXJ95","createdAt":{"$$date":1625760824773},"updatedAt":{"$$date":1625761050146}}
-{"gender":"Жен.","_id":"0DWDxoIXSf8rUqFb","createdAt":{"$$date":1625760795127},"updatedAt":{"$$date":1625761052401}}
-{"$$deleted":true,"_id":"djedLdkvwTEzXJ95"}
-{"$$deleted":true,"_id":"0DWDxoIXSf8rUqFb"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625761134942}}
-{"number":null,"name":"gello","gender":null,"hi":null,"percent":null,"_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625761137503}}
-{"number":null,"name":"gello","gender":"Жен.","hi":null,"percent":null,"_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625761139067}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"obNyleFvSUF8OSgS","createdAt":{"$$date":1625761140914},"updatedAt":{"$$date":1625761140914}}
-{"number":null,"name":"efgefewfefewf","gender":null,"hi":null,"percent":null,"_id":"obNyleFvSUF8OSgS","createdAt":{"$$date":1625761140914},"updatedAt":{"$$date":1625761142564}}
-{"number":null,"name":"efgefewfefewf","gender":"Муж.","hi":null,"percent":null,"_id":"obNyleFvSUF8OSgS","createdAt":{"$$date":1625761140914},"updatedAt":{"$$date":1625761144367}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625761146618}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"UTRRqHCQtwWCNYZS","createdAt":{"$$date":1625761146786},"updatedAt":{"$$date":1625761146786}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"lfF8iuUdNPO9R6Mc","createdAt":{"$$date":1625761146929},"updatedAt":{"$$date":1625761146929}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"scWV4wWzZvh08eVX","createdAt":{"$$date":1625761147100},"updatedAt":{"$$date":1625761147100}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"C0J0BjMjZnxUabaR","createdAt":{"$$date":1625761147242},"updatedAt":{"$$date":1625761147242}}
-{"$$deleted":true,"_id":"C0J0BjMjZnxUabaR"}
-{"$$deleted":true,"_id":"scWV4wWzZvh08eVX"}
-{"$$deleted":true,"_id":"lfF8iuUdNPO9R6Mc"}
-{"$$deleted":true,"_id":"UTRRqHCQtwWCNYZS"}
-{"number":null,"name":"gello","gender":"Жен.","hi":"3","percent":null,"_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625761258334}}
-{"number":null,"name":"efgefewfefewf","gender":"Муж.","hi":"34","percent":null,"_id":"obNyleFvSUF8OSgS","createdAt":{"$$date":1625761140914},"updatedAt":{"$$date":1625761259463}}
-{"number":null,"name":null,"gender":null,"hi":"34","percent":null,"_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625761279481}}
-{"number":null,"name":null,"gender":"Муж.","hi":"34","percent":null,"_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625761281503}}
-{"number":null,"name":"dfd","gender":"Муж.","hi":"34","percent":null,"_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625761282767}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"mcESwsi5lgiW972K","createdAt":{"$$date":1625761316796},"updatedAt":{"$$date":1625761316796}}
-{"$$deleted":true,"_id":"mcESwsi5lgiW972K"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"o0iS2hc1do7kZtJ2","createdAt":{"$$date":1625761322214},"updatedAt":{"$$date":1625761322214}}
-{"$$deleted":true,"_id":"o0iS2hc1do7kZtJ2"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"qibCiD5uayBFstgs","createdAt":{"$$date":1625761328765},"updatedAt":{"$$date":1625761328765}}
-{"$$deleted":true,"_id":"qibCiD5uayBFstgs"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625761342446}}
-{"number":null,"name":"gello","gender":"Жен.","hi":"3","percent":"34","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625761447500}}
-{"number":null,"name":"efgefewfefewf","gender":"Муж.","hi":"34","percent":"345","_id":"obNyleFvSUF8OSgS","createdAt":{"$$date":1625761140914},"updatedAt":{"$$date":1625761450882}}
-{"number":null,"name":"dfd","gender":"Муж.","hi":"34","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625761452222}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625761454024}}
-{"number":null,"name":null,"gender":"Жен.","hi":null,"percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625761473946}}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"P1pHoQwwJu61vnEx","createdAt":{"$$date":1625761477113},"updatedAt":{"$$date":1625761477113}}
-{"number":null,"name":null,"gender":"Жен.","hi":null,"percent":null,"_id":"P1pHoQwwJu61vnEx","createdAt":{"$$date":1625761477113},"updatedAt":{"$$date":1625761483065}}
-{"number":null,"name":null,"gender":"Жен.","hi":"2","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625761498580}}
-{"number":null,"name":null,"gender":"Жен.","hi":"2","percent":null,"_id":"P1pHoQwwJu61vnEx","createdAt":{"$$date":1625761477113},"updatedAt":{"$$date":1625761500239}}
-{"number":null,"name":null,"gender":"Жен.","hi":"2","percent":"34","_id":"P1pHoQwwJu61vnEx","createdAt":{"$$date":1625761477113},"updatedAt":{"$$date":1625761501103}}
-{"number":null,"name":"dsfdsf","gender":"Жен.","hi":"2","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625761503114}}
-{"number":null,"name":"fd3253 dfdf df2","gender":"Жен.","hi":"2","percent":"34","_id":"P1pHoQwwJu61vnEx","createdAt":{"$$date":1625761477113},"updatedAt":{"$$date":1625761506066}}
-{"number":"2","name":"gello","gender":"Жен.","hi":"3","percent":"34","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625761583112}}
-{"number":"3","name":"efgefewfefewf","gender":"Муж.","hi":"34","percent":"345","_id":"obNyleFvSUF8OSgS","createdAt":{"$$date":1625761140914},"updatedAt":{"$$date":1625761583490}}
-{"number":"4","name":"dfd","gender":"Муж.","hi":"34","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625761584568}}
-{"number":"5","name":"dsfdsf","gender":"Жен.","hi":"2","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625761585218}}
-{"number":"6","name":"fd3253 dfdf df2","gender":"Жен.","hi":"2","percent":"34","_id":"P1pHoQwwJu61vnEx","createdAt":{"$$date":1625761477113},"updatedAt":{"$$date":1625761585964}}
-{"$$deleted":true,"_id":"P1pHoQwwJu61vnEx"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"xGopPIgBFbun9vDS","createdAt":{"$$date":1625761589209},"updatedAt":{"$$date":1625761589209}}
-{"$$deleted":true,"_id":"xGopPIgBFbun9vDS"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"vrdSQiZIWX9yKViD","createdAt":{"$$date":1625761599204},"updatedAt":{"$$date":1625761599204}}
-{"$$deleted":true,"_id":"vrdSQiZIWX9yKViD"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"tz1252XI0vi8YETX","createdAt":{"$$date":1625761755364},"updatedAt":{"$$date":1625761755364}}
-{"$$deleted":true,"_id":"tz1252XI0vi8YETX"}
-{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"XlpzdFeHPxvCvdJB","createdAt":{"$$date":1625761759995},"updatedAt":{"$$date":1625761759995}}
-{"number":null,"name":null,"gender":"Жен.","hi":null,"percent":null,"_id":"XlpzdFeHPxvCvdJB","createdAt":{"$$date":1625761759995},"updatedAt":{"$$date":1625761763930}}
-{"$$deleted":true,"_id":"XlpzdFeHPxvCvdJB"}
+{"number":"RU005714","name":"Абахов Олег Евгеньевич","gender":"Муж.","hi":"54.0","percent":"344","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625852923812},"undefined":"Муж."}
+{"number":"RU006267","name":"Алексеев Николай Константинович","gender":"Муж.","hi":"24.1","percent":"6","_id":"P1Hl1kT8mSrsva9b","createdAt":{"$$date":1625764484373},"updatedAt":{"$$date":1625850609368},"undefined":"Муж."}
+{"number":"RU000692","name":"Андреева Дарья Алексеевна","gender":"Жен.","hi":"31.8","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625852924824},"undefined":"Жен."}
+{"number":"RU003582","name":"Алексеева Екатерина Юрьевна","gender":"Жен.","hi":"36.1","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625850612121},"undefined":"Жен."}
+{"number":null,"name":"dsfs fds dsfs dsf. df","gender":"Муж.","hi":null,"percent":null,"_id":"hArfPMmBRwXmxOKX","createdAt":{"$$date":1625847139483},"updatedAt":{"$$date":1625850447074},"undefined":"Муж."}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"qageh4FvJMexbmBk","createdAt":{"$$date":1625849617693},"updatedAt":{"$$date":1625849617693}}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"-34","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625852925857},"undefined":"Муж."}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625854070632},"undefined":"Муж."}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"hawkH1Q9Z1jykh9Y","createdAt":{"$$date":1625854396587},"updatedAt":{"$$date":1625854396587}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"gG8UZs8msiJ4pGSh","createdAt":{"$$date":1625854397212},"updatedAt":{"$$date":1625854397212}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"NN96CWYz4piE8eSa","createdAt":{"$$date":1625854397670},"updatedAt":{"$$date":1625854397670}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"ZQIhG1wdCP43G01B","createdAt":{"$$date":1625854398098},"updatedAt":{"$$date":1625854398098}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Evb0872v91DPKfoM","createdAt":{"$$date":1625854398582},"updatedAt":{"$$date":1625854398582}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"qNSIlfAwQJiwfgUL","createdAt":{"$$date":1625854399080},"updatedAt":{"$$date":1625854399080}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"k0lSAwxjklahQns1","createdAt":{"$$date":1625854399778},"updatedAt":{"$$date":1625854399778}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Zj64IIZ4YhVnxHFp","createdAt":{"$$date":1625854402658},"updatedAt":{"$$date":1625854402658}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"NeBbJf49iro3KHx7","createdAt":{"$$date":1625854403494},"updatedAt":{"$$date":1625854403494}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"8OkM5nu6ax2Z7Lx8","createdAt":{"$$date":1625854404216},"updatedAt":{"$$date":1625854404216}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"PMeXiuINfRZa8e3N","createdAt":{"$$date":1625854404860},"updatedAt":{"$$date":1625854404860}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"few4jz03WtkkZWBi","createdAt":{"$$date":1625854405869},"updatedAt":{"$$date":1625854405869}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"lYgOno8dbMhN16T1","createdAt":{"$$date":1625854409280},"updatedAt":{"$$date":1625854409280}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"NNLeI024zSV3AXUx","createdAt":{"$$date":1625854410307},"updatedAt":{"$$date":1625854410307}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"4aeAmTgG85IXzMN2","createdAt":{"$$date":1625854411224},"updatedAt":{"$$date":1625854411224}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"rsAcZp1CcQ9M31NO","createdAt":{"$$date":1625854412279},"updatedAt":{"$$date":1625854412279}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"sWPSbtvktwtYVzfz","createdAt":{"$$date":1625854430268},"updatedAt":{"$$date":1625854430268}}
+{"$$deleted":true,"_id":"PMeXiuINfRZa8e3N"}
+{"$$deleted":true,"_id":"8OkM5nu6ax2Z7Lx8"}
+{"$$deleted":true,"_id":"NeBbJf49iro3KHx7"}
+{"$$deleted":true,"_id":"Zj64IIZ4YhVnxHFp"}
+{"$$deleted":true,"_id":"k0lSAwxjklahQns1"}
+{"$$deleted":true,"_id":"qNSIlfAwQJiwfgUL"}
+{"$$deleted":true,"_id":"Evb0872v91DPKfoM"}
+{"$$deleted":true,"_id":"ZQIhG1wdCP43G01B"}
+{"$$deleted":true,"_id":"NN96CWYz4piE8eSa"}
+{"$$deleted":true,"_id":"gG8UZs8msiJ4pGSh"}
+{"$$deleted":true,"_id":"hawkH1Q9Z1jykh9Y"}
+{"$$deleted":true,"_id":"qageh4FvJMexbmBk"}
+{"$$deleted":true,"_id":"lYgOno8dbMhN16T1"}
+{"$$deleted":true,"_id":"NNLeI024zSV3AXUx"}
+{"$$deleted":true,"_id":"4aeAmTgG85IXzMN2"}
+{"$$deleted":true,"_id":"rsAcZp1CcQ9M31NO"}
+{"$$deleted":true,"_id":"sWPSbtvktwtYVzfz"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"6XAkdDEROP67y17j","createdAt":{"$$date":1625854498898},"updatedAt":{"$$date":1625854498898}}
+{"$$deleted":true,"_id":"6XAkdDEROP67y17j"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Ars2kBMjnfmZF5B1","createdAt":{"$$date":1625854501368},"updatedAt":{"$$date":1625854501368}}
+{"number":null,"name":null,"gender":"Жен.","hi":null,"percent":null,"_id":"Ars2kBMjnfmZF5B1","createdAt":{"$$date":1625854501368},"updatedAt":{"$$date":1625854501677}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"GCmFWjltkZUa4wKt","createdAt":{"$$date":1625854501896},"updatedAt":{"$$date":1625854501896}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"qL1n3Mi6mFuNL3VR","createdAt":{"$$date":1625854502254},"updatedAt":{"$$date":1625854502254}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"7oGKAznXiGuulQ7u","createdAt":{"$$date":1625854502397},"updatedAt":{"$$date":1625854502397}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Jl8OalcBstXI1teg","createdAt":{"$$date":1625854502924},"updatedAt":{"$$date":1625854502924}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"3dCxUcaBhsGIrUOf","createdAt":{"$$date":1625854503432},"updatedAt":{"$$date":1625854503432}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"3Pc4RFy7RgHdEb1E","createdAt":{"$$date":1625854503717},"updatedAt":{"$$date":1625854503717}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"z4o1dOtxuKFFMg01","createdAt":{"$$date":1625854504916},"updatedAt":{"$$date":1625854504916}}
+{"$$deleted":true,"_id":"7oGKAznXiGuulQ7u"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"n4dhkS0P5r2ejd9r","createdAt":{"$$date":1625854507003},"updatedAt":{"$$date":1625854507003}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"2xxS5yJVzmABFosb","createdAt":{"$$date":1625854508154},"updatedAt":{"$$date":1625854508154}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"kFWFTQ1IgPSw1MW6","createdAt":{"$$date":1625854508996},"updatedAt":{"$$date":1625854508996}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"5TMNLM8SYpZ4wfSI","createdAt":{"$$date":1625854510603},"updatedAt":{"$$date":1625854510603}}
+{"$$deleted":true,"_id":"3dCxUcaBhsGIrUOf"}
+{"$$deleted":true,"_id":"5TMNLM8SYpZ4wfSI"}
+{"$$deleted":true,"_id":"2xxS5yJVzmABFosb"}
+{"$$deleted":true,"_id":"n4dhkS0P5r2ejd9r"}
+{"$$deleted":true,"_id":"z4o1dOtxuKFFMg01"}
+{"$$deleted":true,"_id":"3Pc4RFy7RgHdEb1E"}
+{"$$deleted":true,"_id":"Jl8OalcBstXI1teg"}
+{"$$deleted":true,"_id":"qL1n3Mi6mFuNL3VR"}
+{"$$deleted":true,"_id":"GCmFWjltkZUa4wKt"}
+{"$$deleted":true,"_id":"Ars2kBMjnfmZF5B1"}
+{"$$deleted":true,"_id":"few4jz03WtkkZWBi"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"E3MxomIK6fkHY2Jh","createdAt":{"$$date":1625854523671},"updatedAt":{"$$date":1625854523671}}
+{"$$deleted":true,"_id":"kFWFTQ1IgPSw1MW6"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"h7txAFL0rekOihOa","createdAt":{"$$date":1625854527654},"updatedAt":{"$$date":1625854527654}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"TgLLyHCRptwEKGIx","createdAt":{"$$date":1625854528808},"updatedAt":{"$$date":1625854528808}}
+{"$$deleted":true,"_id":"E3MxomIK6fkHY2Jh"}
+{"$$deleted":true,"_id":"h7txAFL0rekOihOa"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"uQEgv23YQ6XjFVf6","createdAt":{"$$date":1625854534390},"updatedAt":{"$$date":1625854534390}}
+{"$$deleted":true,"_id":"uQEgv23YQ6XjFVf6"}
+{"$$deleted":true,"_id":"TgLLyHCRptwEKGIx"}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625855840965},"undefined":"Муж."}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"jxf6yqEWD3RUJoOP","createdAt":{"$$date":1625855845100},"updatedAt":{"$$date":1625855845100}}
+{"number":null,"name":"path stroke=\"blue\" d=\"M5 60 l215 0\" />","gender":null,"hi":null,"percent":null,"_id":"jxf6yqEWD3RUJoOP","createdAt":{"$$date":1625855845100},"updatedAt":{"$$date":1625855846973}}
+{"number":null,"name":"path stroke=\"blue\" d=\"M5 60 l215 0\" /> SVG stroke-width Property","gender":null,"hi":null,"percent":null,"_id":"jxf6yqEWD3RUJoOP","createdAt":{"$$date":1625855845100},"updatedAt":{"$$date":1625855853083}}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625855935738},"undefined":"Муж."}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625855936362},"undefined":"Муж."}
+{"number":null,"name":"dsfs fds dsfs dsf. df","gender":"Муж.","hi":null,"percent":null,"_id":"hArfPMmBRwXmxOKX","createdAt":{"$$date":1625847139483},"updatedAt":{"$$date":1625855936814},"undefined":"Муж."}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"TPO7FCDgTxeX0dHh","createdAt":{"$$date":1625855937417},"updatedAt":{"$$date":1625855937417}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"yfa1oVZLvIadayAt","createdAt":{"$$date":1625855938684},"updatedAt":{"$$date":1625855938684}}
+{"$$deleted":true,"_id":"yfa1oVZLvIadayAt"}
+{"$$deleted":true,"_id":"TPO7FCDgTxeX0dHh"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"pWDIEwMThuuSM6Xd","createdAt":{"$$date":1625855941012},"updatedAt":{"$$date":1625855941012}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"ck3pcOFkTOuaXsNa","createdAt":{"$$date":1625855941538},"updatedAt":{"$$date":1625855941538}}
+{"$$deleted":true,"_id":"ck3pcOFkTOuaXsNa"}
+{"$$deleted":true,"_id":"pWDIEwMThuuSM6Xd"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"55pbwRunMiZbt8LK","createdAt":{"$$date":1625855943147},"updatedAt":{"$$date":1625855943147}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"KHZF5W8TxtVSBvyq","createdAt":{"$$date":1625855943624},"updatedAt":{"$$date":1625855943624}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"q7g7nLqRHUC8UD01","createdAt":{"$$date":1625855944151},"updatedAt":{"$$date":1625855944151}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"g9vAD2HJIi7bwUHp","createdAt":{"$$date":1625855947008},"updatedAt":{"$$date":1625855947008}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"2dG1dgdASCNHwt8p","createdAt":{"$$date":1625855947584},"updatedAt":{"$$date":1625855947584}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"8kj8tL2F4H4NURhq","createdAt":{"$$date":1625855948157},"updatedAt":{"$$date":1625855948157}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"OJQZxbx5UR1bMaUe","createdAt":{"$$date":1625855948831},"updatedAt":{"$$date":1625855948831}}
+{"$$deleted":true,"_id":"OJQZxbx5UR1bMaUe"}
+{"$$deleted":true,"_id":"8kj8tL2F4H4NURhq"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"0U1EfEUJHjPh3FC5","createdAt":{"$$date":1625855952958},"updatedAt":{"$$date":1625855952958}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Wnys2iNr8DoNyH1d","createdAt":{"$$date":1625855954968},"updatedAt":{"$$date":1625855954968}}
+{"$$deleted":true,"_id":"Wnys2iNr8DoNyH1d"}
+{"$$deleted":true,"_id":"0U1EfEUJHjPh3FC5"}
+{"$$deleted":true,"_id":"g9vAD2HJIi7bwUHp"}
+{"$$deleted":true,"_id":"2dG1dgdASCNHwt8p"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"NOTzJfkAsaBlg5sd","createdAt":{"$$date":1625855958329},"updatedAt":{"$$date":1625855958329}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"3Wwqe4wGmLS1Dcqu","createdAt":{"$$date":1625855958951},"updatedAt":{"$$date":1625855958951}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"pfYPpc8fwT7tUT1Q","createdAt":{"$$date":1625855960341},"updatedAt":{"$$date":1625855960341}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"QF9ZlB2HlljHPzBz","createdAt":{"$$date":1625855964837},"updatedAt":{"$$date":1625855964837}}
+{"$$deleted":true,"_id":"QF9ZlB2HlljHPzBz"}
+{"$$deleted":true,"_id":"pfYPpc8fwT7tUT1Q"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"aq5sdbDxH3W1pcvz","createdAt":{"$$date":1625855968477},"updatedAt":{"$$date":1625855968477}}
+{"$$deleted":true,"_id":"aq5sdbDxH3W1pcvz"}
+{"$$deleted":true,"_id":"3Wwqe4wGmLS1Dcqu"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"PIpWmNFMRLA6WHGp","createdAt":{"$$date":1625855977236},"updatedAt":{"$$date":1625855977236}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"RfjUq3m6JQ1TFCOu","createdAt":{"$$date":1625855977888},"updatedAt":{"$$date":1625855977888}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"S6HhCmpuKwlD3FFS","createdAt":{"$$date":1625855979702},"updatedAt":{"$$date":1625855979702}}
+{"$$deleted":true,"_id":"S6HhCmpuKwlD3FFS"}
+{"$$deleted":true,"_id":"PIpWmNFMRLA6WHGp"}
+{"$$deleted":true,"_id":"RfjUq3m6JQ1TFCOu"}
+{"$$deleted":true,"_id":"NOTzJfkAsaBlg5sd"}
+{"$$deleted":true,"_id":"q7g7nLqRHUC8UD01"}
+{"$$deleted":true,"_id":"KHZF5W8TxtVSBvyq"}
+{"$$deleted":true,"_id":"55pbwRunMiZbt8LK"}
+{"number":null,"name":"path stroke=\"blue\" d=\"M5 60 l215 0\" /> SVG stroke-width Property","gender":null,"hi":null,"percent":null,"_id":"jxf6yqEWD3RUJoOP","createdAt":{"$$date":1625855845100},"updatedAt":{"$$date":1625855989656}}
+{"number":null,"name":"dsfs fds dsfs dsf. df","gender":"Муж.","hi":null,"percent":null,"_id":"hArfPMmBRwXmxOKX","createdAt":{"$$date":1625847139483},"updatedAt":{"$$date":1625855990014},"undefined":"Муж."}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625855990688},"undefined":"Муж."}
+{"number":"RU006267","name":"Алексеев Николай Константинович","gender":"Муж.","hi":"24.1","percent":"6","_id":"P1Hl1kT8mSrsva9b","createdAt":{"$$date":1625764484373},"updatedAt":{"$$date":1625855990953},"undefined":"Муж."}
+{"number":"RU003582","name":"Алексеева Екатерина Юрьевна","gender":"Жен.","hi":"36.1","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625855991239},"undefined":"Жен."}
+{"number":"RU000692","name":"Андреева Дарья Алексеевна","gender":"Жен.","hi":"31.8","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625855991503},"undefined":"Жен."}
+{"number":"RU005714","name":"Абахов Олег Евгеньевич","gender":"Муж.","hi":"54.0","percent":"344","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625855991863},"undefined":"Муж."}
+{"number":"RU005714","name":"Абахов Олег Евгеньевич","gender":"Муж.","hi":"54.0","percent":"344","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625855992197},"undefined":"Муж."}
+{"number":"RU000692","name":"Андреева Дарья Алексеевна","gender":"Жен.","hi":"31.8","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625855992801},"undefined":"Жен."}
+{"number":"RU003582","name":"Алексеева Екатерина Юрьевна","gender":"Жен.","hi":"36.1","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625855993108},"undefined":"Жен."}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625855994049},"undefined":"Муж."}
+{"number":"RU006267","name":"Алексеев Николай Константинович","gender":"Муж.","hi":"24.1","percent":"6","_id":"P1Hl1kT8mSrsva9b","createdAt":{"$$date":1625764484373},"updatedAt":{"$$date":1625855994839},"undefined":"Муж."}
+{"number":"RU006267","name":"Алексеев Николай Константинович","gender":"Муж.","hi":"24.1","percent":"6","_id":"P1Hl1kT8mSrsva9b","createdAt":{"$$date":1625764484373},"updatedAt":{"$$date":1625855995125},"undefined":"Муж."}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"354jrngdIRGmd6NX","createdAt":{"$$date":1625855995937},"updatedAt":{"$$date":1625855995937}}
+{"$$deleted":true,"_id":"354jrngdIRGmd6NX"}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625856000185},"undefined":"Муж."}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625856000518},"undefined":"Муж."}
+{"number":"RU006267","name":"Алексеев Николай Константинович","gender":"Муж.","hi":"24.1","percent":"6","_id":"P1Hl1kT8mSrsva9b","createdAt":{"$$date":1625764484373},"updatedAt":{"$$date":1625856001005},"undefined":"Муж."}
+{"number":"RU006267","name":"Алексеев Николай Константинович","gender":"Муж.","hi":"24.1","percent":"6","_id":"P1Hl1kT8mSrsva9b","createdAt":{"$$date":1625764484373},"updatedAt":{"$$date":1625856001313},"undefined":"Муж."}
+{"number":"RU003582","name":"Алексеева Екатерина Юрьевна","gender":"Жен.","hi":"36.1","percent":"87","_id":"Zj5UTHk6l0reDuFq","createdAt":{"$$date":1625761342446},"updatedAt":{"$$date":1625856001602},"undefined":"Жен."}
+{"number":"RU000692","name":"Андреева Дарья Алексеевна","gender":"Жен.","hi":"31.8","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625856002486},"undefined":"Жен."}
+{"number":"RU000692","name":"Андреева Дарья Алексеевна","gender":"Жен.","hi":"31.8","percent":"12","_id":"YYzDXPw5DQ8us906","createdAt":{"$$date":1625761146618},"updatedAt":{"$$date":1625856003019},"undefined":"Жен."}
+{"number":"RU005714","name":"Абахов Олег Евгеньевич","gender":"Муж.","hi":"54.0","percent":"344","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625856003352},"undefined":"Муж."}
+{"number":"RU005714","name":"Абахов Олег Евгеньевич","gender":"Муж.","hi":"54.0","percent":"344","_id":"5NMK5goyqlGtAKOj","createdAt":{"$$date":1625761134942},"updatedAt":{"$$date":1625856004047},"undefined":"Муж."}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"mktrsRPB53LDXkKK","createdAt":{"$$date":1625856047710},"updatedAt":{"$$date":1625856047710}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Wwffb0gAFFy35WNH","createdAt":{"$$date":1625856048732},"updatedAt":{"$$date":1625856048732}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"Gq41T6O6oy8Bisgg","createdAt":{"$$date":1625856049912},"updatedAt":{"$$date":1625856049912}}
+{"$$deleted":true,"_id":"Gq41T6O6oy8Bisgg"}
+{"$$deleted":true,"_id":"Wwffb0gAFFy35WNH"}
+{"$$deleted":true,"_id":"mktrsRPB53LDXkKK"}
+{"$$deleted":true,"_id":"jxf6yqEWD3RUJoOP"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"wfcVoSrdM7NeOqoy","createdAt":{"$$date":1625856054227},"updatedAt":{"$$date":1625856054227}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"9T1rmP2OH4Guxt9E","createdAt":{"$$date":1625856054878},"updatedAt":{"$$date":1625856054878}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"gLrWwy36wsmp61GO","createdAt":{"$$date":1625856055426},"updatedAt":{"$$date":1625856055426}}
+{"$$deleted":true,"_id":"gLrWwy36wsmp61GO"}
+{"$$deleted":true,"_id":"9T1rmP2OH4Guxt9E"}
+{"$$deleted":true,"_id":"wfcVoSrdM7NeOqoy"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"fxaFeJ5jSw1i5KRW","createdAt":{"$$date":1625856057611},"updatedAt":{"$$date":1625856057611}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"3DqLMDq8EtwZf9Xq","createdAt":{"$$date":1625856058135},"updatedAt":{"$$date":1625856058135}}
+{"$$deleted":true,"_id":"3DqLMDq8EtwZf9Xq"}
+{"$$deleted":true,"_id":"fxaFeJ5jSw1i5KRW"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"EZM3R8NEo3pt0T6o","createdAt":{"$$date":1625856059817},"updatedAt":{"$$date":1625856059817}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"xbkqUxIvd6yEjEMJ","createdAt":{"$$date":1625856060320},"updatedAt":{"$$date":1625856060320}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"bPwRIUzzVgfoo3zr","createdAt":{"$$date":1625856060847},"updatedAt":{"$$date":1625856060847}}
+{"$$deleted":true,"_id":"bPwRIUzzVgfoo3zr"}
+{"$$deleted":true,"_id":"xbkqUxIvd6yEjEMJ"}
+{"$$deleted":true,"_id":"EZM3R8NEo3pt0T6o"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"77g6pMyjVYVySHOo","createdAt":{"$$date":1625856064995},"updatedAt":{"$$date":1625856064995}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"MPc9zL2AVnGR3Q3n","createdAt":{"$$date":1625856065743},"updatedAt":{"$$date":1625856065743}}
+{"$$deleted":true,"_id":"MPc9zL2AVnGR3Q3n"}
+{"$$deleted":true,"_id":"77g6pMyjVYVySHOo"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"ioO51JkJ5hFgd113","createdAt":{"$$date":1625856192067},"updatedAt":{"$$date":1625856192067}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"bkAigVNOez0lmYKh","createdAt":{"$$date":1625856192694},"updatedAt":{"$$date":1625856192694}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"YzqefFkbNgy177h6","createdAt":{"$$date":1625856270538},"updatedAt":{"$$date":1625856270538}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"mNmBKUZbVr1UH0pN","createdAt":{"$$date":1625856271716},"updatedAt":{"$$date":1625856271716}}
+{"$$deleted":true,"_id":"mNmBKUZbVr1UH0pN"}
+{"$$deleted":true,"_id":"YzqefFkbNgy177h6"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"jB05H59llZEWRHw3","createdAt":{"$$date":1625856274402},"updatedAt":{"$$date":1625856274402}}
+{"$$deleted":true,"_id":"jB05H59llZEWRHw3"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"5fczdaR1NkWSlkO9","createdAt":{"$$date":1625856278287},"updatedAt":{"$$date":1625856278287}}
+{"$$deleted":true,"_id":"5fczdaR1NkWSlkO9"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"zAzXlOpnQZWKL3W0","createdAt":{"$$date":1625856281979},"updatedAt":{"$$date":1625856281979}}
+{"number":null,"name":null,"gender":"Жен.","hi":null,"percent":null,"_id":"zAzXlOpnQZWKL3W0","createdAt":{"$$date":1625856281979},"updatedAt":{"$$date":1625856284044}}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"BgklrUWhk9pLuK7H","createdAt":{"$$date":1625856284617},"updatedAt":{"$$date":1625856284617}}
+{"number":null,"name":null,"gender":"Муж.","hi":null,"percent":null,"_id":"bkAigVNOez0lmYKh","createdAt":{"$$date":1625856192694},"updatedAt":{"$$date":1625856285790}}
+{"$$deleted":true,"_id":"BgklrUWhk9pLuK7H"}
+{"$$deleted":true,"_id":"zAzXlOpnQZWKL3W0"}
+{"number":null,"name":null,"gender":null,"hi":null,"percent":null,"_id":"HldBDqnblnvXcDsK","createdAt":{"$$date":1625856288788},"updatedAt":{"$$date":1625856288788}}
+{"$$deleted":true,"_id":"HldBDqnblnvXcDsK"}
+{"$$deleted":true,"_id":"bkAigVNOez0lmYKh"}
+{"number":"RU006580","name":"Акмаев Анвар Динарович.","gender":"Муж.","hi":"10","percent":"10","_id":"ssK1BToYJ14Yjxp8","createdAt":{"$$date":1625845072660},"updatedAt":{"$$date":1625856292867},"undefined":"Муж."}
