@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import db from './db';
-import { IPCRendererMessage } from './types';
+import { Row, IPCRendererMessage } from './types';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -73,7 +73,7 @@ ipcMain.on('toMain', async (event, { type, payload }: IPCRendererMessage) => {
     }
     case 'update': {
       await db.rows.update(
-        { _id: (payload as { _id: number })._id },
+        { _id: (payload as { _id: Row['_id'] })._id },
         (payload as { data: unknown }).data
       );
       break;

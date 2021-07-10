@@ -18,11 +18,11 @@ export type IPCRendererMessage =
     }
   | {
       type: 'remove';
-      payload: { _id: number };
+      payload: Pick<Row, '_id'>;
     }
   | {
       type: 'update';
-      payload: { _id: number; data: Row };
+      payload: { _id: Row['_id']; data: Row };
     };
 
 export type IPCMainMessage =
@@ -36,7 +36,7 @@ export type IPCMainMessage =
     };
 
 export type Row = {
-  _id: number;
+  _id: string;
   number: number;
   name: string;
   gender: string;

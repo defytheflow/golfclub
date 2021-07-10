@@ -26,28 +26,85 @@ const genders = [
   },
 ];
 
-type EditedRow = {
-  id: number | null;
+type EditRow = {
+  id: Row['_id'] | null;
   field: string | null;
 };
+
+type TableState = {
+  rows: Row[];
+  widths: number[];
+  percents: number[];
+  editRow: EditRow;
+};
+
+type TableAction =
+  | { type: 'set_rows'; payload: Row[] }
+  | { type: 'add_row'; payload: Row }
+  | { type: 'delete_row'; payload: Row['_id'] }
+  | { type: 'update_row'; payload: Row }
+  | { type: 'edit_row'; payload: EditRow }
+  | { type: 'add_percent' }
+  | { type: 'delete_percent'; payload: number };
 
 // TODO: change widths. makew widths static. add gorizontal scrollbar.
 // TODO: Ctrl + z for rows deletions.
 function App() {
-  const [rows, setRows] = React.useState<Row[]>([]);
-  const [percents, setPercents] = React.useState([10, 20]);
-  const [editedRow, setEditedRow] = React.useState<EditedRow>({ id: null, field: null });
+  const [state, dispatch] = React.useReducer(
+    (state: TableState, action: TableAction) => {
+      switch (action.type) {
+        case 'set_rows': {
+          return { ...state, rows: action.payload };
+        }
+        case 'add_row': {
+          const newRows = [...state.rows, action.payload];
+          return { ...state, rows: newRows };
+        }
+        case 'delete_row': {
+          const newRows = state.rows.filter(row => row._id !== action.payload);
+          return { ...state, rows: newRows };
+        }
+        case 'update_row': {
+          const { _id, ...data } = action.payload;
+          const newRows = state.rows.slice();
+          const rowIndex = newRows.findIndex(row => row._id === _id);
+          newRows[rowIndex] = { ...newRows[rowIndex], ...data };
+          return { ...state, editRow: { id: null, field: null }, rows: newRows };
+        }
+        case 'edit_row': {
+          return { ...state, editRow: action.payload };
+        }
+        case 'add_percent': {
+          const newPercents = [...state.percents, 5];
+          const lastWidth = state.widths[state.widths.length - 1];
+          const newWidths = [...state.widths.slice(0, -1), 25, lastWidth];
+          return { ...state, percents: newPercents, widths: newWidths };
+        }
+        case 'delete_percent': {
+          const newPercents = state.percents.filter((_, i) => i !== action.payload);
+          const newWidths = state.widths.filter((_, i) => i !== action.payload);
+          return { ...state, percents: newPercents, widths: newWidths };
+        }
+      }
+    },
+    {
+      rows: [],
+      widths: [50, 100, 300, 100, 25, 25, 100],
+      percents: [50],
+      editRow: { id: null, field: null },
+    }
+  );
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'find' });
     window.api.receive('fromMain', ({ type, payload }: IPCMainMessage) => {
       switch (type) {
         case 'find': {
-          setRows(payload as Row[]);
+          dispatch({ type: 'set_rows', payload: payload as Row[] });
           break;
         }
         case 'insert': {
-          setRows(prevRows => [...prevRows, payload as Row]);
+          dispatch({ type: 'add_row', payload: payload as Row });
           break;
         }
       }
@@ -58,7 +115,7 @@ function App() {
     console.log('Refreshing all');
   }
 
-  function refreshRow(rowIndex: number) {
+  function refreshRow(rowIndex: Row['_id']) {
     console.log(`Refreshing ${rowIndex}`);
   }
 
@@ -67,50 +124,35 @@ function App() {
     window.api.send('toMain', { type: 'insert', payload: newRow });
   }
 
-  function deleteRow(rowID: number) {
+  function deleteRow(rowID: Row['_id']) {
     window.api.send('toMain', { type: 'remove', payload: { _id: rowID } });
-    setRows(prevRows => prevRows.filter(row => row._id !== rowID));
+    dispatch({ type: 'delete_row', payload: rowID });
   }
 
-  function updateRow(rowID: number, field: keyof Row, value: string) {
+  function updateRow(rowID: Row['_id'], field: keyof Row, value: string) {
     value = value.trim();
-    const updatedRow = rows.find(row => row._id === rowID);
+    const updatedRow = state.rows.find(row => row._id === rowID);
 
     window.api.send('toMain', {
       type: 'update',
       payload: { _id: rowID, data: { ...updatedRow, [field]: value } },
     });
 
-    setRows(prevRows => {
-      const newRows = prevRows.slice();
-      const rowIndex = newRows.findIndex(row => row._id === rowID);
-      newRows[rowIndex] = { ...updatedRow, [field]: value };
-      return newRows;
-    });
-
-    setEditedRow({ id: null, field: null });
+    dispatch({ type: 'update_row', payload: { ...updatedRow, [field]: value } });
   }
 
-  function addPercent() {
-    setPercents(prevPercents => [...prevPercents, 5]);
-  }
-
-  function deletePercent(percentI: number) {
-    setPercents(prevPercents => prevPercents.filter((_, i) => i !== percentI));
-  }
-
-  function handleBlur(e: React.FocusEvent<HTMLInputElement>, rowID: number) {
+  function handleBlur(e: React.FocusEvent<HTMLInputElement>, rowID: Row['_id']) {
     const { name, value } = e.target;
     if (value) updateRow(rowID, name as keyof Row, value);
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>, rowID: number) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>, rowID: Row['_id']) {
     const { value } = e.target;
     if (value) updateRow(rowID, 'gender', value);
   }
 
-  function handleClick(e: React.MouseEvent, rowID: number, field: string) {
-    setEditedRow({ id: rowID, field });
+  function handleClick(e: React.MouseEvent, rowID: Row['_id'], field: string) {
+    dispatch({ type: 'edit_row', payload: { id: rowID, field } });
   }
 
   function renderGenderCell(row: Row) {
@@ -132,7 +174,7 @@ function App() {
     ));
 
     let content;
-    if (editedRow.id === row._id && editedRow.field === 'gender') {
+    if (state.editRow.id === row._id && state.editRow.field === 'gender') {
       content = <TextField {...inputProps}>{options}</TextField>;
     } else if (row.gender === null) {
       content = <TextField {...inputProps}>{options}</TextField>;
@@ -160,7 +202,7 @@ function App() {
       },
     };
 
-    if (editedRow.id === row._id && editedRow.field === field) {
+    if (state.editRow.id === row._id && state.editRow.field === field) {
       content = (
         <TextField {...baseInputProps} {...inputProps} defaultValue={row[field]} />
       );
@@ -193,18 +235,18 @@ function App() {
       </div>
       <br />
       <TableContainer component={Paper}>
+        <colgroup>
+          <col width='5%' />
+          <col width='5%' />
+          <col width='30%' />
+          <col width='10%' />
+          <col width='10%' />
+          {state.percents.map((_, i) => (
+            <col key={i} width='5%' />
+          ))}
+          <col width='11%' />
+        </colgroup>
         <Table size='small'>
-          <colgroup>
-            <col width='5%' />
-            <col width='5%' />
-            <col width='30%' />
-            <col width='10%' />
-            <col width='10%' />
-            {percents.map((_, i) => (
-              <col key={i} width='5%' />
-            ))}
-            <col width='11%' />
-          </colgroup>
           <TableHead>
             <TableRow>
               <TableCell align='center'></TableCell>
@@ -212,7 +254,7 @@ function App() {
               <TableCell align='left'>Фамилия, &nbsp;Имя, &nbsp;Отчество</TableCell>
               <TableCell align='center'>Пол</TableCell>
               <TableCell align='center'>HI</TableCell>
-              {percents.map((percent, i) => {
+              {state.percents.map((percent, i) => {
                 const showDelete = i !== 0;
                 return (
                   <TableCell align='center' key={i} style={{ position: 'relative' }}>
@@ -221,7 +263,7 @@ function App() {
                         size='small'
                         iconStyle={{ width: 20 }}
                         style={{ position: 'absolute', right: -3, top: -5 }}
-                        onClick={() => deletePercent(i)}
+                        onClick={() => dispatch({ type: 'delete_percent', payload: i })}
                       />
                     )}
                     <Button>{percent}%</Button>
@@ -229,19 +271,22 @@ function App() {
                 );
               })}
               <TableCell align='center'>
-                <AddBtn iconStyle={{ width: 29, height: 29 }} onClick={addPercent} />
+                <AddBtn
+                  iconStyle={{ width: 29, height: 29 }}
+                  onClick={() => dispatch({ type: 'add_percent' })}
+                />
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, i) => (
+            {state.rows.map((row, i) => (
               <TableRow key={i}>
                 <TableCell align='center'>{i + 1}</TableCell>
-                {renderCell(row, 'number', null)}
+                {renderCell(row, 'number')}
                 {renderCell(row, 'name', { align: 'left' })}
                 {renderGenderCell(row)}
                 {renderCell(row, 'hi', null)}
-                {percents.map((percent, i) => (
+                {state.percents.map((percent, i) => (
                   <TableCell align='center' key={i}>
                     {row.hi ? (row.hi * percent) / 100 : '-'}
                   </TableCell>
@@ -255,7 +300,6 @@ function App() {
           </TableBody>
         </Table>
       </TableContainer>
-
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <AddBtn iconStyle={{ width: 40, height: 40 }} onClick={addRow} />
       </div>
