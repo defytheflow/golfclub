@@ -15,29 +15,23 @@ module.exports = [
     },
   },
   {
-    test: /\.jsx?$/,
+    test: /\.tsx?$/,
+    exclude: /(node_modules|.webpack)/,
     use: {
-      loader: 'babel-loader',
+      loader: 'ts-loader',
       options: {
-        exclude: /node_modules/,
-        presets: ['@babel/preset-react', '@emotion/babel-preset-css-prop'],
+        transpileOnly: true,
       },
     },
   },
-  // Put your webpack loader rules in this array.  This is where you would put
-  // your ts-loader configuration for instance:
-  /**
-   * Typescript Example:
-   *
-   * {
-   *   test: /\.tsx?$/,
-   *   exclude: /(node_modules|.webpack)/,
-   *   loaders: [{
-   *     loader: 'ts-loader',
-   *     options: {
-   *       transpileOnly: true
-   *     }
-   *   }]
-   * }
-   */
+  // {
+  //   test: /\.jsx?$/,
+  //   use: {
+  //     loader: 'babel-loader',
+  //     options: {
+  //       exclude: /node_modules/,
+  //       presets: ['@babel/preset-react', '@emotion/babel-preset-css-prop'],
+  //     },
+  //   },
+  // },
 ];

@@ -1,5 +1,10 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const db = require('./db');
+import { app, BrowserWindow, ipcMain } from 'electron';
+
+import db from './db';
+import { IPCRendererMessage } from './types';
+
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -7,11 +12,11 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-let mainWindow;
+let win: BrowserWindow;
 
 const createWindow = () => {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  win = new BrowserWindow({
     width: 900,
     height: 600,
     webPreferences: {
@@ -20,10 +25,10 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  win.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -50,24 +55,27 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on('toMain', async (event, { type, payload }) => {
+ipcMain.on('toMain', async (event, { type, payload }: IPCRendererMessage) => {
   switch (type) {
     case 'find': {
-      const data = await db.find({}).sort({ createdAt: 1 });
-      mainWindow.webContents.send('fromMain', { payload: data });
+      const data = await db.rows.find({}).sort({ createdAt: 1 });
+      win.webContents.send('fromMain', { type: 'find', payload: data });
       break;
     }
     case 'insert': {
-      const res = await db.insert(payload);
-      mainWindow.webContents.send('fromMain', { type: 'insert', payload: res });
+      const res = await db.rows.insert(payload);
+      win.webContents.send('fromMain', { type: 'insert', payload: res });
       break;
     }
     case 'remove': {
-      await db.remove(payload);
+      await db.rows.remove(payload, {});
       break;
     }
     case 'update': {
-      await db.update({ _id: payload._id }, payload.data);
+      await db.rows.update(
+        { _id: (payload as { _id: number })._id },
+        (payload as { data: unknown }).data
+      );
       break;
     }
   }

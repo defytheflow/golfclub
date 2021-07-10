@@ -1,12 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { css } from '@emotion/react';
 
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import RefreshIcon from '@material-ui/icons/Refresh';
-import AddIcon from '@material-ui/icons/Add';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,11 +9,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Tooltip from '@material-ui/core/Tooltip';
-import TextField from '@material-ui/core/TextField';
+import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
-import ClearIcon from '@material-ui/icons/Clear';
-import ViewModuleIcon from '@material-ui/icons/ViewModule';
+
+import { AddBtn, DeleteBtn, RefreshBtn, RestoreBtn } from './buttons';
+import { IPCMainMessage, Row } from './types';
 
 const genders = [
   {
@@ -31,21 +26,30 @@ const genders = [
   },
 ];
 
+type EditedRow = {
+  id: number | null;
+  field: string | null;
+};
+
 // TODO: change widths. makew widths static. add gorizontal scrollbar.
 // TODO: Ctrl + z for rows deletions.
-// TODO: green color for plus icons.
 function App() {
-  const [rows, setRows] = React.useState([]);
+  const [rows, setRows] = React.useState<Row[]>([]);
   const [percents, setPercents] = React.useState([10, 20]);
-  const [editedRow, setEditedRow] = React.useState({ id: null, field: null });
+  const [editedRow, setEditedRow] = React.useState<EditedRow>({ id: null, field: null });
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'find' });
-    window.api.receive('fromMain', ({ type, payload }) => {
-      if (type === 'insert') {
-        setRows(prevRows => [...prevRows, payload]);
-      } else {
-        setRows(payload);
+    window.api.receive('fromMain', ({ type, payload }: IPCMainMessage) => {
+      switch (type) {
+        case 'find': {
+          setRows(payload as Row[]);
+          break;
+        }
+        case 'insert': {
+          setRows(prevRows => [...prevRows, payload as Row]);
+          break;
+        }
       }
     });
   }, []);
@@ -54,21 +58,21 @@ function App() {
     console.log('Refreshing all');
   }
 
-  function refreshRow(rowIndex) {
+  function refreshRow(rowIndex: number) {
     console.log(`Refreshing ${rowIndex}`);
   }
 
   function addRow() {
-    const newRow = createData(null, null, null, null, null);
+    const newRow = createData(null, null, null, null);
     window.api.send('toMain', { type: 'insert', payload: newRow });
   }
 
-  function deleteRow(rowID) {
+  function deleteRow(rowID: number) {
     window.api.send('toMain', { type: 'remove', payload: { _id: rowID } });
     setRows(prevRows => prevRows.filter(row => row._id !== rowID));
   }
 
-  function updateRow(rowID, field, value) {
+  function updateRow(rowID: number, field: keyof Row, value: string) {
     value = value.trim();
     const updatedRow = rows.find(row => row._id === rowID);
 
@@ -79,46 +83,46 @@ function App() {
 
     setRows(prevRows => {
       const newRows = prevRows.slice();
-      const updatedRow = newRows.find(row => row._id === rowID);
-      updatedRow[field] = value;
+      const rowIndex = newRows.findIndex(row => row._id === rowID);
+      newRows[rowIndex] = { ...updatedRow, [field]: value };
       return newRows;
     });
 
-    setEditedRow({ rowID: null, field: null });
+    setEditedRow({ id: null, field: null });
   }
 
   function addPercent() {
     setPercents(prevPercents => [...prevPercents, 5]);
   }
 
-  function deletePercent(percentI) {
+  function deletePercent(percentI: number) {
     setPercents(prevPercents => prevPercents.filter((_, i) => i !== percentI));
   }
 
-  function handleBlur(e, rowID) {
+  function handleBlur(e: React.FocusEvent<HTMLInputElement>, rowID: number) {
     const { name, value } = e.target;
-    if (value) updateRow(rowID, name, value);
+    if (value) updateRow(rowID, name as keyof Row, value);
   }
 
-  function handleChange(e, rowID) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>, rowID: number) {
     const { value } = e.target;
     if (value) updateRow(rowID, 'gender', value);
   }
 
-  function handleClick(e, rowID, field) {
+  function handleClick(e: React.MouseEvent, rowID: number, field: string) {
     setEditedRow({ id: rowID, field });
   }
 
-  function renderGenderCell(row) {
-    const inputProps = {
+  function renderGenderCell(row: Row) {
+    const inputProps: TextFieldProps = {
       autoFocus: true,
       select: true,
       style: {
         minWidth: '100%',
       },
       value: row.gender ?? '',
-      onChange: e => handleChange(e, row._id),
-      onBlur: e => handleBlur(e, row._id),
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e, row._id),
+      onBlur: (e: React.FocusEvent<HTMLInputElement>) => handleBlur(e, row._id),
     };
 
     const options = genders.map(({ value, label }) => (
@@ -143,12 +147,13 @@ function App() {
     return <TableCell align='center'>{content}</TableCell>;
   }
 
-  function renderCell(row, field, cellProps = {}, inputProps = {}) {
+  function renderCell(row: Row, field: keyof Row, cellProps = {}, inputProps = {}) {
     let content;
-    let baseInputProps = {
+
+    const baseInputProps: TextFieldProps = {
       autoFocus: true,
       name: field,
-      onBlur: e => handleBlur(e, row._id),
+      onBlur: (e: React.FocusEvent<HTMLInputElement>) => handleBlur(e, row._id),
       style: {
         maxWidth: 'fit-content',
         minWidth: '100%',
@@ -179,24 +184,12 @@ function App() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Tooltip title='Восстановить вид' placement='bottom'>
-          <IconButton
-            color='primary'
-            component='button'
-            variant='outlined'
-            >
-            <ViewModuleIcon css={{ width: 35, height: 35 }}/>
-          </IconButton>
-        </Tooltip>
-        <Tooltip title='Обновить всe' placement='bottom'>
-          <IconButton
-            color='primary'
-            component='button'
-            variant='outlined'
-            onClick={refreshAllRows}>
-            <RefreshIcon css={{ width: 35, height: 35 }} />
-          </IconButton>
-        </Tooltip>
+        <RestoreBtn />
+        <RefreshBtn
+          title='Обновить всe'
+          iconStyle={{ width: 35, height: 35 }}
+          onClick={refreshAllRows}
+        />
       </div>
       <br />
       <TableContainer component={Paper}>
@@ -224,10 +217,10 @@ function App() {
                 return (
                   <TableCell align='center' key={i} style={{ position: 'relative' }}>
                     {showDelete && (
-                      <Delete
+                      <DeleteBtn
                         size='small'
-                        css={{ position: 'absolute', right: -3, top: -5 }}
-                        iconCss={{ width: 20 }}
+                        iconStyle={{ width: 20 }}
+                        style={{ position: 'absolute', right: -3, top: -5 }}
                         onClick={() => deletePercent(i)}
                       />
                     )}
@@ -236,7 +229,7 @@ function App() {
                 );
               })}
               <TableCell align='center'>
-                <Add iconCss={{ width: 29, height: 29 }} onClick={addPercent} />
+                <AddBtn iconStyle={{ width: 29, height: 29 }} onClick={addPercent} />
               </TableCell>
             </TableRow>
           </TableHead>
@@ -254,8 +247,8 @@ function App() {
                   </TableCell>
                 ))}
                 <TableCell>
-                  <Refresh onClick={() => refreshRow(row._id)} />
-                  <Delete onClick={() => deleteRow(row._id)} />
+                  <RefreshBtn onClick={() => refreshRow(row._id)} />
+                  <DeleteBtn onClick={() => deleteRow(row._id)} />
                 </TableCell>
               </TableRow>
             ))}
@@ -264,44 +257,19 @@ function App() {
       </TableContainer>
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Add iconCss={{ width: 40, height: 40 }} onClick={addRow} />
+        <AddBtn iconStyle={{ width: 40, height: 40 }} onClick={addRow} />
       </div>
     </>
   );
 }
 
-function Add({ iconCss, title = 'Добавить', ...rest }) {
-  return (
-    <Tooltip title={title} placement='bottom'>
-      <IconButton color='primary' component='button' variant='outlined' {...rest}>
-        <AddIcon  css={iconCss} />
-      </IconButton>
-    </Tooltip>
-  );
-}
-
-function Refresh({ onClick }) {
-  return (
-    <Tooltip title='Обновить'>
-      <IconButton color='primary' component='button' onClick={onClick}>
-        <RefreshIcon />
-      </IconButton>
-    </Tooltip>
-  );
-}
-
-function Delete({ iconCss, placement = 'bottom', ...rest }) {
-  return (
-    <Tooltip title='Удалить' placement={placement}>
-      <IconButton color='secondary' component='button' {...rest}>
-        <ClearIcon css={iconCss} />
-      </IconButton>
-    </Tooltip>
-  );
-}
-
-function createData(number, name, gender, hi, percent) {
-  return { number, name, gender, hi, percent };
+function createData(
+  number: number | null,
+  name: string | null,
+  gender: string | null,
+  hi: number | null
+) {
+  return { number, name, gender, hi };
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
