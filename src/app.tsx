@@ -13,103 +13,99 @@ import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import { AddBtn, DeleteBtn, RefreshBtn, RestoreBtn } from './buttons';
-import { IPCMainMessage, Row } from './types';
+import { Row, Column, DBAction } from './types';
 
-const genders = [
-  {
-    label: 'Муж.',
-    value: 'Муж.',
-  },
-  {
-    label: 'Жен.',
-    value: 'Жен.',
-  },
-];
-
-type EditRow = {
-  id: Row['_id'] | null;
+type EditedCell = {
+  id: Row['_id'] | Column['_id'] | null;
   field: string | null;
 };
 
 type TableState = {
   rows: Row[];
-  widths: number[];
-  percents: number[];
-  editRow: EditRow;
+  columns: Column[];
+  history: Row[];
+  editedRow: EditedCell;
 };
 
 type TableAction =
-  | { type: 'set_rows'; payload: Row[] }
-  | { type: 'add_row'; payload: Row }
-  | { type: 'delete_row'; payload: Row['_id'] }
-  | { type: 'update_row'; payload: Row }
-  | { type: 'edit_row'; payload: EditRow }
-  | { type: 'add_percent' }
-  | { type: 'delete_percent'; payload: number };
+  | DBAction
+  | { type: 'edit_row'; payload: EditedCell }
+  | { type: 'undo_row' };
 
-// TODO: change widths. makew widths static. add gorizontal scrollbar.
-// TODO: Ctrl + z for rows deletions.
-function App() {
-  const [state, dispatch] = React.useReducer(
-    (state: TableState, action: TableAction) => {
-      switch (action.type) {
-        case 'set_rows': {
-          return { ...state, rows: action.payload };
-        }
-        case 'add_row': {
-          const newRows = [...state.rows, action.payload];
-          return { ...state, rows: newRows };
-        }
-        case 'delete_row': {
-          const newRows = state.rows.filter(row => row._id !== action.payload);
-          return { ...state, rows: newRows };
-        }
-        case 'update_row': {
-          const { _id, ...data } = action.payload;
-          const newRows = state.rows.slice();
-          const rowIndex = newRows.findIndex(row => row._id === _id);
-          newRows[rowIndex] = { ...newRows[rowIndex], ...data };
-          return { ...state, editRow: { id: null, field: null }, rows: newRows };
-        }
-        case 'edit_row': {
-          return { ...state, editRow: action.payload };
-        }
-        case 'add_percent': {
-          const newPercents = [...state.percents, 5];
-          const lastWidth = state.widths[state.widths.length - 1];
-          const newWidths = [...state.widths.slice(0, -1), 25, lastWidth];
-          return { ...state, percents: newPercents, widths: newWidths };
-        }
-        case 'delete_percent': {
-          const newPercents = state.percents.filter((_, i) => i !== action.payload);
-          const newWidths = state.widths.filter((_, i) => i !== action.payload);
-          return { ...state, percents: newPercents, widths: newWidths };
-        }
-      }
-    },
-    {
-      rows: [],
-      widths: [50, 100, 300, 100, 25, 25, 100],
-      percents: [50],
-      editRow: { id: null, field: null },
+function tableReducer(state: TableState, action: TableAction): TableState {
+  switch (action.type) {
+    case 'load': {
+      return { ...state, ...action.payload };
     }
-  );
+    case 'insert_row': {
+      return { ...state, rows: [...state.rows, action.payload] };
+    }
+    case 'update_row': {
+      const { _id, ...data } = action.payload;
+      const rows = state.rows.map(row => (row._id === _id ? { ...row, ...data } : row));
+      return { ...state, editedRow: { id: null, field: null }, rows };
+    }
+    case 'remove_row': {
+      const row = state.rows.find(row => row._id === action.payload);
+      const newRows = state.rows.filter(row => row._id !== action.payload);
+      return { ...state, rows: newRows, history: [...state.history, row] };
+    }
+    case 'insert_column': {
+      const columns = state.columns.slice(0, -1);
+      const last = state.columns.slice(-1);
+      return { ...state, columns: [...columns, action.payload, ...last] };
+    }
+    case 'update_column': {
+      const { _id, ...data } = action.payload;
+      const columns = state.columns.map(column =>
+        column._id === _id ? { ...column, ...data } : column
+      );
+      return { ...state, editedRow: { id: null, field: null }, columns };
+    }
+    case 'remove_column': {
+      const columns = state.columns.filter(column => column._id !== action.payload);
+      return { ...state, columns };
+    }
+    case 'edit_row': {
+      return { ...state, editedRow: action.payload };
+    }
+    case 'undo_row': {
+      return { ...state, history: state.history.slice(0, -1) };
+    }
+  }
+}
+
+function App() {
+  const [state, dispatch] = React.useReducer(tableReducer, {
+    rows: [],
+    columns: [],
+    history: [],
+    editedRow: { id: null, field: null },
+  });
 
   React.useEffect(() => {
-    window.api.send('toMain', { type: 'find' });
-    window.api.receive('fromMain', ({ type, payload }: IPCMainMessage) => {
-      switch (type) {
-        case 'find': {
-          dispatch({ type: 'set_rows', payload: payload as Row[] });
-          break;
-        }
-        case 'insert': {
-          dispatch({ type: 'add_row', payload: payload as Row });
-          break;
-        }
-      }
-    });
+    window.api.send('toMain', { type: 'load' });
+    window.api.receive('fromMain', dispatch);
   }, []);
+
+  React.useEffect(() => {
+    function undoRow() {
+      const lastRow = state.history.slice(-1)[0];
+      window.api.send('toMain', { type: 'insert_row', payload: lastRow });
+      dispatch({ type: 'undo_row' });
+    }
+    function handleKeyPress(e: KeyboardEvent) {
+      if (
+        e.key === 'z' &&
+        ((e.ctrlKey && window.platform !== 'darwin') ||
+          (e.metaKey && window.platform === 'darwin'))
+      ) {
+        if (state.history.length) undoRow();
+      }
+    }
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [state.history]);
 
   function refreshAllRows() {
     console.log('Refreshing all');
@@ -119,26 +115,39 @@ function App() {
     console.log(`Refreshing ${rowIndex}`);
   }
 
-  function addRow() {
-    const newRow = createData(null, null, null, null);
-    window.api.send('toMain', { type: 'insert', payload: newRow });
+  function insertRow() {
+    window.api.send('toMain', {
+      type: 'insert_row',
+      payload: createRow(null, null, null, null),
+    });
   }
 
-  function deleteRow(rowID: Row['_id']) {
-    window.api.send('toMain', { type: 'remove', payload: { _id: rowID } });
-    dispatch({ type: 'delete_row', payload: rowID });
+  function removeRow(rowID: Row['_id']) {
+    window.api.send('toMain', { type: 'remove_row', payload: rowID });
   }
 
   function updateRow(rowID: Row['_id'], field: keyof Row, value: string) {
-    value = value.trim();
-    const updatedRow = state.rows.find(row => row._id === rowID);
-
+    const row = state.rows.find(row => row._id === rowID);
     window.api.send('toMain', {
-      type: 'update',
-      payload: { _id: rowID, data: { ...updatedRow, [field]: value } },
+      type: 'update_row',
+      payload: { ...row, [field]: value.trim() },
     });
+  }
 
-    dispatch({ type: 'update_row', payload: { ...updatedRow, [field]: value } });
+  function insertColumn() {
+    window.api.send('toMain', { type: 'insert_column', payload: createColumn(50, 25) });
+  }
+
+  function updateColumn(columnID: Column['_id'], value: number) {
+    const column = state.columns.find(column => column._id === columnID);
+    window.api.send('toMain', {
+      type: 'update_column',
+      payload: { ...column, percent: value },
+    });
+  }
+
+  function removeColumn(columnID: Column['_id']) {
+    window.api.send('toMain', { type: 'remove_column', payload: columnID });
   }
 
   function handleBlur(e: React.FocusEvent<HTMLInputElement>, rowID: Row['_id']) {
@@ -151,7 +160,7 @@ function App() {
     if (value) updateRow(rowID, 'gender', value);
   }
 
-  function handleClick(e: React.MouseEvent, rowID: Row['_id'], field: string) {
+  function handleClick(e: React.MouseEvent, rowID: Row['_id'], field: string | null) {
     dispatch({ type: 'edit_row', payload: { id: rowID, field } });
   }
 
@@ -167,14 +176,14 @@ function App() {
       onBlur: (e: React.FocusEvent<HTMLInputElement>) => handleBlur(e, row._id),
     };
 
-    const options = genders.map(({ value, label }) => (
-      <MenuItem key={value} value={value}>
-        {label}
+    const options = ['Муж.', 'Жен.'].map(gender => (
+      <MenuItem key={gender} value={gender}>
+        {gender}
       </MenuItem>
     ));
 
     let content;
-    if (state.editRow.id === row._id && state.editRow.field === 'gender') {
+    if (state.editedRow.id === row._id && state.editedRow.field === 'gender') {
       content = <TextField {...inputProps}>{options}</TextField>;
     } else if (row.gender === null) {
       content = <TextField {...inputProps}>{options}</TextField>;
@@ -202,7 +211,7 @@ function App() {
       },
     };
 
-    if (state.editRow.id === row._id && state.editRow.field === field) {
+    if (state.editedRow.id === row._id && state.editedRow.field === field) {
       content = (
         <TextField {...baseInputProps} {...inputProps} defaultValue={row[field]} />
       );
@@ -223,8 +232,40 @@ function App() {
     );
   }
 
+  function renderColumn(column: Column, i: number) {
+    let content;
+
+    if (state.editedRow.id == column._id && state.editedRow.field === null) {
+      content = (
+        <TextField
+          onBlur={e => updateColumn(column._id, Number(e.target.value))}
+          defaultValue={column.percent}
+        />
+      );
+    } else {
+      content = (
+        <Button onClick={e => handleClick(e, column._id, null)}>{column.percent}%</Button>
+      );
+    }
+
+    return (
+      <TableCell align='center' style={{ position: 'relative' }} key={i}>
+        {i !== 0 && (
+          <DeleteBtn
+            size='small'
+            iconStyle={{ width: 20 }}
+            style={{ position: 'absolute', right: -3, top: -5 }}
+            onClick={() => removeColumn(column._id)}
+          />
+        )}
+        {content}
+      </TableCell>
+    );
+  }
+
   return (
     <>
+      {/* <pre>{JSON.stringify(state, null, 1)}</pre> */}
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <RestoreBtn />
         <RefreshBtn
@@ -235,18 +276,12 @@ function App() {
       </div>
       <br />
       <TableContainer component={Paper}>
-        <colgroup>
-          <col width='5%' />
-          <col width='5%' />
-          <col width='30%' />
-          <col width='10%' />
-          <col width='10%' />
-          {state.percents.map((_, i) => (
-            <col key={i} width='5%' />
-          ))}
-          <col width='11%' />
-        </colgroup>
         <Table size='small'>
+          <colgroup>
+            {state.columns.map(column => (
+              <col key={column._id} width={column.width} />
+            ))}
+          </colgroup>
           <TableHead>
             <TableRow>
               <TableCell align='center'></TableCell>
@@ -254,27 +289,9 @@ function App() {
               <TableCell align='left'>Фамилия, &nbsp;Имя, &nbsp;Отчество</TableCell>
               <TableCell align='center'>Пол</TableCell>
               <TableCell align='center'>HI</TableCell>
-              {state.percents.map((percent, i) => {
-                const showDelete = i !== 0;
-                return (
-                  <TableCell align='center' key={i} style={{ position: 'relative' }}>
-                    {showDelete && (
-                      <DeleteBtn
-                        size='small'
-                        iconStyle={{ width: 20 }}
-                        style={{ position: 'absolute', right: -3, top: -5 }}
-                        onClick={() => dispatch({ type: 'delete_percent', payload: i })}
-                      />
-                    )}
-                    <Button>{percent}%</Button>
-                  </TableCell>
-                );
-              })}
+              {state.columns.filter(column => 'percent' in column).map(renderColumn)}
               <TableCell align='center'>
-                <AddBtn
-                  iconStyle={{ width: 29, height: 29 }}
-                  onClick={() => dispatch({ type: 'add_percent' })}
-                />
+                <AddBtn iconStyle={{ width: 29, height: 29 }} onClick={insertColumn} />
               </TableCell>
             </TableRow>
           </TableHead>
@@ -286,14 +303,16 @@ function App() {
                 {renderCell(row, 'name', { align: 'left' })}
                 {renderGenderCell(row)}
                 {renderCell(row, 'hi', null)}
-                {state.percents.map((percent, i) => (
-                  <TableCell align='center' key={i}>
-                    {row.hi ? (row.hi * percent) / 100 : '-'}
-                  </TableCell>
-                ))}
+                {state.columns
+                  .filter(column => 'percent' in column)
+                  .map(({ percent }, i) => (
+                    <TableCell align='center' key={i}>
+                      {row.hi ? (row.hi * percent) / 100 : '-'}
+                    </TableCell>
+                  ))}
                 <TableCell>
                   <RefreshBtn onClick={() => refreshRow(row._id)} />
-                  <DeleteBtn onClick={() => deleteRow(row._id)} />
+                  <DeleteBtn onClick={() => removeRow(row._id)} />
                 </TableCell>
               </TableRow>
             ))}
@@ -301,19 +320,23 @@ function App() {
         </Table>
       </TableContainer>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <AddBtn iconStyle={{ width: 40, height: 40 }} onClick={addRow} />
+        <AddBtn iconStyle={{ width: 40, height: 40 }} onClick={insertRow} />
       </div>
     </>
   );
 }
 
-function createData(
+function createRow(
   number: number | null,
   name: string | null,
   gender: string | null,
   hi: number | null
 ) {
   return { number, name, gender, hi };
+}
+
+function createColumn(width: number, percent?: number) {
+  return { width, ...(percent && { percent }) };
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,21 +1,19 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import db from './db';
-import { Row, IPCRendererMessage } from './types';
+import { DBAction } from './types';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
-  // eslint-disable-line global-require
   app.quit();
 }
 
 let win: BrowserWindow;
 
-const createWindow = () => {
-  // Create the browser window.
+function createWindow() {
   win = new BrowserWindow({
     width: 900,
     height: 600,
@@ -23,13 +21,10 @@ const createWindow = () => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
-
-  // and load the index.html of the app.
   win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-  // Open the DevTools.
   win.webContents.openDevTools();
-};
+  db.init();
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -53,29 +48,44 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-ipcMain.on('toMain', async (event, { type, payload }: IPCRendererMessage) => {
-  switch (type) {
-    case 'find': {
-      const data = await db.rows.find({}).sort({ createdAt: 1 });
-      win.webContents.send('fromMain', { type: 'find', payload: data });
+ipcMain.on('toMain', async (event, action: DBAction) => {
+  switch (action.type) {
+    case 'load': {
+      const rows = await db.rows.find({}).sort({ createdAt: 1 });
+      const columns = (await db.columns.find({})).reverse();
+      win.webContents.send('fromMain', { type: action.type, payload: { rows, columns } });
       break;
     }
-    case 'insert': {
-      const res = await db.rows.insert(payload);
-      win.webContents.send('fromMain', { type: 'insert', payload: res });
+    case 'insert_row': {
+      const row = await db.rows.insert(action.payload);
+      win.webContents.send('fromMain', { type: action.type, payload: row });
       break;
     }
-    case 'remove': {
-      await db.rows.remove(payload, {});
+    case 'update_row': {
+      const { _id, ...data } = action.payload;
+      await db.rows.update({ _id }, data);
+      win.webContents.send('fromMain', action);
       break;
     }
-    case 'update': {
-      await db.rows.update(
-        { _id: (payload as { _id: Row['_id'] })._id },
-        (payload as { data: unknown }).data
-      );
+    case 'remove_row': {
+      await db.rows.remove({ _id: action.payload }, {});
+      win.webContents.send('fromMain', action);
+      break;
+    }
+    case 'insert_column': {
+      const column = await db.columns.insert(action.payload);
+      win.webContents.send('fromMain', { type: action.type, payload: column });
+      break;
+    }
+    case 'update_column': {
+      const { _id, ...data } = action.payload;
+      await db.columns.update({ _id }, data);
+      win.webContents.send('fromMain', action);
+      break;
+    }
+    case 'remove_column': {
+      await db.columns.remove({ _id: action.payload }, {});
+      win.webContents.send('fromMain', action);
       break;
     }
   }

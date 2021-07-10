@@ -1,44 +1,53 @@
 declare global {
   interface Window {
+    platform: NodeJS.Platform;
     api: {
-      send: (channel: 'toMain', message: IPCRendererMessage) => void;
-      receive: (channel: 'fromMain', func: (message: IPCMainMessage) => void) => void;
+      send: (channel: 'toMain', message: DBAction) => void;
+      receive: (channel: 'fromMain', func: (action: DBAction) => void) => void;
     };
   }
 }
 
-export type IPCRendererMessage =
+export type DBAction =
   | {
-      type: 'find';
-      payload?: null;
+      type: 'load';
+      payload?: { rows: Row[]; columns: Column[] };
     }
   | {
-      type: 'insert';
-      payload: Omit<Row, '_id'>;
-    }
-  | {
-      type: 'remove';
-      payload: Pick<Row, '_id'>;
-    }
-  | {
-      type: 'update';
-      payload: { _id: Row['_id']; data: Row };
-    };
-
-export type IPCMainMessage =
-  | {
-      type: 'find';
-      payload: Row[];
-    }
-  | {
-      type: 'insert';
+      type: 'insert_row';
       payload: Row;
+    }
+  | {
+      type: 'update_row';
+      payload: Partial<Row>;
+    }
+  | {
+      type: 'remove_row';
+      payload: Row['_id'];
+    }
+  | {
+      type: 'insert_column';
+      payload: Column;
+    }
+  | {
+      type: 'update_column';
+      payload: Partial<Column>;
+    }
+  | {
+      type: 'remove_column';
+      payload: Column['_id'];
     };
 
 export type Row = {
-  _id: string;
+  _id?: string;
   number: number;
   name: string;
   gender: string;
   hi: number;
+};
+
+export type Column = {
+  _id?: string;
+  width: number;
+  percent?: number;
 };
