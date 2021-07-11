@@ -1,5 +1,6 @@
 * {
   font-size: 0.9rem;
+  box-sizing: border-box;
 }
 
 body {
@@ -16,4 +17,11 @@ table {
 th:not(:last-of-type),
 td:not(:last-of-type) {
   border-right: 1px solid rgba(224, 224, 224, 1);
+}
+
+th, td, button {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
 }

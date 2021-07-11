@@ -43,11 +43,12 @@ export type Row = {
   number: number;
   name: string;
   gender: string;
-  hi: number;
+  hi: number | string;
 };
 
 export type Column = {
   _id?: string;
   width: number;
   percent?: number;
+  order: number;
 };

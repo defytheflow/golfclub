@@ -1,19 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
+import TableCell, { TableCellProps } from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
+import TextField, { TextFieldProps } from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
 
-import { AddBtn, DeleteBtn, RefreshBtn, RestoreBtn } from './buttons';
+import { AddBtn, DeleteBtn, RefreshBtn, RestoreBtn, MyButton } from './buttons';
+import { PercentCell, PercentHeader } from './cells';
 import { Row, Column, DBAction } from './types';
+
+const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
 
 type EditedCell = {
   id: Row['_id'] | Column['_id'] | null;
@@ -75,6 +78,16 @@ function tableReducer(state: TableState, action: TableAction): TableState {
   }
 }
 
+// const defaultColumns = [
+//   { _id: '1', width: 50 },
+//   { _id: '2', width: 100 },
+//   { _id: '3', width: 325 },
+//   { _id: '4', width: 75 },
+//   { _id: '5', width: 75 },
+//   { _id: '6', width: 75, percent: 25 },
+//   { _id: '7', width: 100 },
+// ];
+
 function App() {
   const [state, dispatch] = React.useReducer(tableReducer, {
     rows: [],
@@ -82,6 +95,11 @@ function App() {
     history: [],
     editedRow: { id: null, field: null },
   });
+
+  const { rows, columns, editedRow } = state;
+  const tableWidth = sum(columns.map(column => column.width));
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const percentColumns = columns.filter(column => column.percent);
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'load' });
@@ -107,6 +125,10 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [state.history]);
 
+  React.useEffect(() => {
+    containerRef.current?.scrollBy(1000, 0);
+  }, [columns.length]);
+
   function refreshAllRows() {
     console.log('Refreshing all');
   }
@@ -127,7 +149,7 @@ function App() {
   }
 
   function updateRow(rowID: Row['_id'], field: keyof Row, value: string) {
-    const row = state.rows.find(row => row._id === rowID);
+    const row = rows.find(row => row._id === rowID);
     window.api.send('toMain', {
       type: 'update_row',
       payload: { ...row, [field]: value.trim() },
@@ -135,27 +157,41 @@ function App() {
   }
 
   function insertColumn() {
-    window.api.send('toMain', { type: 'insert_column', payload: createColumn(50, 25) });
+    const prevOrder = columns[columns.length - 2].order;
+    window.api.send('toMain', {
+      type: 'insert_column',
+      payload: createColumn(prevOrder + 1, 75, 25),
+    });
   }
 
   function updateColumn(columnID: Column['_id'], value: number) {
-    const column = state.columns.find(column => column._id === columnID);
+    const column = columns.find(column => column._id === columnID);
     window.api.send('toMain', {
       type: 'update_column',
       payload: { ...column, percent: value },
     });
+    // dispatch({ type: 'update_column', payload: { ...column, percent: value } });
   }
 
   function removeColumn(columnID: Column['_id']) {
     window.api.send('toMain', { type: 'remove_column', payload: columnID });
+    // dispatch({ type: 'remove_column', payload: columnID });
   }
 
   function handleBlur(e: React.FocusEvent<HTMLInputElement>, rowID: Row['_id']) {
-    const { name, value } = e.target;
-    if (value) updateRow(rowID, name as keyof Row, value);
+    let { name, value } = e.target; // eslint-disable-line
+    if (name === 'hi') {
+      value = value.replace(',', '.');
+    }
+    if (value) {
+      updateRow(rowID, name as keyof Row, value);
+    }
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>, rowID: Row['_id']) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    rowID: Row['_id']
+  ) {
     const { value } = e.target;
     if (value) updateRow(rowID, 'gender', value);
   }
@@ -164,41 +200,13 @@ function App() {
     dispatch({ type: 'edit_row', payload: { id: rowID, field } });
   }
 
-  function renderGenderCell(row: Row) {
-    const inputProps: TextFieldProps = {
-      autoFocus: true,
-      select: true,
-      style: {
-        minWidth: '100%',
-      },
-      value: row.gender ?? '',
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e, row._id),
-      onBlur: (e: React.FocusEvent<HTMLInputElement>) => handleBlur(e, row._id),
-    };
-
-    const options = ['Муж.', 'Жен.'].map(gender => (
-      <MenuItem key={gender} value={gender}>
-        {gender}
-      </MenuItem>
-    ));
-
-    let content;
-    if (state.editedRow.id === row._id && state.editedRow.field === 'gender') {
-      content = <TextField {...inputProps}>{options}</TextField>;
-    } else if (row.gender === null) {
-      content = <TextField {...inputProps}>{options}</TextField>;
-    } else {
-      content = (
-        <Button size='small' onClick={e => handleClick(e, row._id, 'gender')}>
-          {row.gender}
-        </Button>
-      );
-    }
-
-    return <TableCell align='center'>{content}</TableCell>;
-  }
-
-  function renderCell(row: Row, field: keyof Row, cellProps = {}, inputProps = {}) {
+  function renderCell(
+    row: Row,
+    field: keyof Row,
+    cellProps: TableCellProps = {},
+    inputProps: TextFieldProps = {},
+    error = false
+  ) {
     let content;
 
     const baseInputProps: TextFieldProps = {
@@ -211,7 +219,7 @@ function App() {
       },
     };
 
-    if (state.editedRow.id === row._id && state.editedRow.field === field) {
+    if (editedRow.id === row._id && editedRow.field === field) {
       content = (
         <TextField {...baseInputProps} {...inputProps} defaultValue={row[field]} />
       );
@@ -219,9 +227,9 @@ function App() {
       content = <TextField {...baseInputProps} {...inputProps} />;
     } else {
       content = (
-        <Button size='small' onClick={e => handleClick(e, row._id, field)}>
-          {row[field]}
-        </Button>
+        <MyButton size='small' onClick={e => handleClick(e, row._id, field)}>
+          <span style={error ? { borderBottom: '1px solid red' } : {}}>{row[field]}</span>
+        </MyButton>
       );
     }
 
@@ -232,41 +240,21 @@ function App() {
     );
   }
 
-  function renderColumn(column: Column, i: number) {
-    let content;
-
-    if (state.editedRow.id == column._id && state.editedRow.field === null) {
-      content = (
-        <TextField
-          onBlur={e => updateColumn(column._id, Number(e.target.value))}
-          defaultValue={column.percent}
-        />
-      );
-    } else {
-      content = (
-        <Button onClick={e => handleClick(e, column._id, null)}>{column.percent}%</Button>
-      );
-    }
-
-    return (
-      <TableCell align='center' style={{ position: 'relative' }} key={i}>
-        {i !== 0 && (
-          <DeleteBtn
-            size='small'
-            iconStyle={{ width: 20 }}
-            style={{ position: 'absolute', right: -3, top: -5 }}
-            onClick={() => removeColumn(column._id)}
-          />
-        )}
-        {content}
-      </TableCell>
-    );
-  }
+  const classes = makeStyles({
+    container: {
+      maxWidth: tableWidth + 25,
+    },
+    table: {
+      width: tableWidth + 25,
+    },
+  })();
 
   return (
     <>
-      {/* <pre>{JSON.stringify(state, null, 1)}</pre> */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      {/* <pre>{JSON.stringify(columns, null, 1)}</pre> */}
+      <div
+        style={{ display: 'flex', justifyContent: 'flex-end' }}
+        className={classes.container}>
         <RestoreBtn />
         <RefreshBtn
           title='Обновить всe'
@@ -274,12 +262,11 @@ function App() {
           onClick={refreshAllRows}
         />
       </div>
-      <br />
-      <TableContainer component={Paper}>
-        <Table size='small'>
+      <TableContainer component={Paper} className={classes.container} ref={containerRef}>
+        <Table size='small' className={classes.table}>
           <colgroup>
-            {state.columns.map(column => (
-              <col key={column._id} width={column.width} />
+            {columns.map((column, i) => (
+              <col key={i} width={column.width} />
             ))}
           </colgroup>
           <TableHead>
@@ -289,28 +276,47 @@ function App() {
               <TableCell align='left'>Фамилия, &nbsp;Имя, &nbsp;Отчество</TableCell>
               <TableCell align='center'>Пол</TableCell>
               <TableCell align='center'>HI</TableCell>
-              {state.columns.filter(column => 'percent' in column).map(renderColumn)}
+              {percentColumns.map((column, i) => (
+                <PercentHeader
+                  key={i}
+                  column={column}
+                  deletable={i !== 0}
+                  edited={editedRow.id === column._id && editedRow.field === null}
+                  onEdit={e => handleClick(e, column._id, null)}
+                  onUpdate={value => updateColumn(column._id, Number(value))}
+                  onDelete={() => removeColumn(column._id)}
+                />
+              ))}
               <TableCell align='center'>
                 <AddBtn iconStyle={{ width: 29, height: 29 }} onClick={insertColumn} />
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {state.rows.map((row, i) => (
+            {rows.map((row, i) => (
               <TableRow key={i}>
                 <TableCell align='center'>{i + 1}</TableCell>
                 {renderCell(row, 'number')}
                 {renderCell(row, 'name', { align: 'left' })}
-                {renderGenderCell(row)}
-                {renderCell(row, 'hi', null)}
-                {state.columns
-                  .filter(column => 'percent' in column)
-                  .map(({ percent }, i) => (
-                    <TableCell align='center' key={i}>
-                      {row.hi ? (row.hi * percent) / 100 : '-'}
-                    </TableCell>
-                  ))}
-                <TableCell>
+                {renderCell(
+                  row,
+                  'gender',
+                  {},
+                  {
+                    select: true,
+                    onChange: e => handleChange(e, row._id),
+                    children: ['Муж.', 'Жен.'].map(gender => (
+                      <MenuItem key={gender} value={gender}>
+                        {gender}
+                      </MenuItem>
+                    )),
+                  }
+                )}
+                {renderCell(row, 'hi', null, null, isNaN(+row.hi) && row.hi !== '-')}
+                {percentColumns.map((column, i) => (
+                  <PercentCell key={i} row={row} column={column} />
+                ))}
+                <TableCell align='center'>
                   <RefreshBtn onClick={() => refreshRow(row._id)} />
                   <DeleteBtn onClick={() => removeRow(row._id)} />
                 </TableCell>
@@ -319,8 +325,10 @@ function App() {
           </TableBody>
         </Table>
       </TableContainer>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <AddBtn iconStyle={{ width: 40, height: 40 }} onClick={insertRow} />
+      <div
+        style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}
+        className={classes.container}>
+        <AddBtn iconStyle={{ width: 35, height: 35 }} onClick={insertRow} />
       </div>
     </>
   );
@@ -335,8 +343,8 @@ function createRow(
   return { number, name, gender, hi };
 }
 
-function createColumn(width: number, percent?: number) {
-  return { width, ...(percent && { percent }) };
+function createColumn(order: number, width: number, percent?: number) {
+  return { order, width, ...(percent && { percent }) };
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));

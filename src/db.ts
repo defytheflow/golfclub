@@ -10,20 +10,23 @@ function dbFactory(filename: string, options = {}) {
   });
 }
 
+const defaultColumns = [
+  { order: 1, width: 50 },
+  { order: 2, width: 100 },
+  { order: 3, width: 325 },
+  { order: 4, width: 75 },
+  { order: 5, width: 75 },
+  { order: 6, width: 75, percent: 25 },
+  { order: 10000, width: 100 },
+];
+
 export default {
   rows: dbFactory('rows.db', { timestampData: true }),
   columns: dbFactory('columns.db'),
   async init() {
     const data = await this.columns.find({});
     if (data.length === 0) {
-      [
-        { width: 50 },
-        { width: 100 },
-        { width: 300 },
-        { width: 50 },
-        { width: 50 },
-        { width: 50, percent: 25 },
-      ].forEach(column => this.columns.insert(column));
+      this.columns.insert(defaultColumns);
     }
   },
 };
