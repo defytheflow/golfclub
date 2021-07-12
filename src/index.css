@@ -8,6 +8,7 @@ body {
     sans-serif;
   margin: auto;
   padding: 2rem;
+  background-color: #f0efeb;
 }
 
 table {
@@ -16,7 +17,15 @@ table {
 
 th:not(:last-of-type),
 td:not(:last-of-type) {
-  border-right: 1px solid rgba(224, 224, 224, 1);
+  border-right: 3px solid rgba(224, 224, 224, 1);
+}
+
+th {
+  border-bottom: 3px solid rgba(224, 224, 224, 1) !important;
+}
+
+tr:not(:last-of-type) td {
+  border-bottom: 3px solid rgba(224, 224, 224, 1) !important;
 }
 
 th, td, button {

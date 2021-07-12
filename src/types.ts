@@ -40,10 +40,10 @@ export type DBAction =
 
 export type Row = {
   _id?: string;
-  number: number;
+  number: string;
   name: string;
   gender: string;
-  hi: number | string;
+  hi: string;
 };
 
 export type Column = {

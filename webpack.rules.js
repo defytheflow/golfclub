@@ -30,7 +30,7 @@ module.exports = [
   //     loader: 'babel-loader',
   //     options: {
   //       exclude: /node_modules/,
-  //       presets: ['@babel/preset-react', '@emotion/babel-preset-css-prop'],
+  //       presets: ['@emotion/babel-preset-css-prop'],
   //     },
   //   },
   // },

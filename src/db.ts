@@ -1,6 +1,10 @@
-import { app } from 'electron';
 import path from 'path';
+import { readFileSync } from 'fs';
+
+import { app } from 'electron';
 import Datastore from 'nedb-promises';
+
+import { Row } from './types';
 
 function dbFactory(filename: string, options = {}) {
   return Datastore.create({
@@ -8,6 +12,28 @@ function dbFactory(filename: string, options = {}) {
     autoload: true,
     ...options,
   });
+}
+
+function loadPlayers() {
+  const players: Row[] = [];
+  const lines = readFileSync('players.csv', 'utf8').split('\r\n');
+
+  for (let i = 1; i < lines.length - 1; i++) {
+    const line = lines[i].trim().split(';');
+    const number = line[0]?.trim();
+    const name = line[1]?.replace('.', '')?.trim();
+    const gender = normalizeGender(line[3]?.trim().toLowerCase());
+    const hi = line[4]?.trim().replace(',', '.');
+    players.push({ number, name, gender, hi });
+  }
+
+  return players;
+}
+
+function normalizeGender(gender?: string) {
+  if (gender === 'м') return 'Муж.';
+  if (gender === 'ж') return 'Жен.';
+  return gender;
 }
 
 const defaultColumns = [
@@ -24,8 +50,12 @@ export default {
   rows: dbFactory('rows.db', { timestampData: true }),
   columns: dbFactory('columns.db'),
   async init() {
-    const data = await this.columns.find({});
-    if (data.length === 0) {
+    const rows = await this.rows.find({});
+    if (rows.length === 0) {
+      this.rows.insert(loadPlayers());
+    }
+    const columns = await this.columns.find({});
+    if (columns.length === 0) {
       this.columns.insert(defaultColumns);
     }
   },

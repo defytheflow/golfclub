@@ -1,38 +1,46 @@
 import React from 'react';
 
-import Button, { ButtonProps } from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
-import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import { makeStyles } from '@material-ui/core/styles';
 
 interface MyIconButtonProps extends IconButtonProps {
-  title?: string;
   iconStyle?: React.CSSProperties;
 }
 
-export function MyButton({ children, ...rest }: ButtonProps) {
-  const classes = makeStyles({
-    label: {
-      fontWeight: 'normal',
-      textTransform: 'none',
-    },
-  })();
+export function CellButton({ align, children, onClick }: any) {
   return (
-    <Button classes={{ ...rest.classes, ...classes }} {...rest}>
+    <div
+      style={{
+        width: '100%',
+        minHeight: 25,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: align == 'left' ? 'left' : 'center',
+        // cursor: 'pointer',
+        // backgroundColor: 'yellow',
+      }}
+      onClick={onClick}>
       {children}
-    </Button>
+    </div>
   );
 }
 
-export function AddBtn({ title = 'Добавить', iconStyle, ...rest }: MyIconButtonProps) {
+const useAddButtonStyles = makeStyles({
+  root: {
+    color: '#4caf50',
+  },
+});
+
+export function AddButton({ iconStyle, ...rest }: MyIconButtonProps) {
+  const classes = useAddButtonStyles();
   return (
-    <Tooltip title={title}>
+    <Tooltip title='Добавить'>
       <IconButton
-        style={{ color: '#4caf50' }}
+        classes={{ ...rest.classes, ...classes }}
         color='primary'
         component='button'
         {...rest}>
@@ -42,9 +50,9 @@ export function AddBtn({ title = 'Добавить', iconStyle, ...rest }: MyIco
   );
 }
 
-export function DeleteBtn({ title = 'Удалить', iconStyle, ...rest }: MyIconButtonProps) {
+export function DeleteButton({ iconStyle, ...rest }: MyIconButtonProps) {
   return (
-    <Tooltip title={title}>
+    <Tooltip title='Удалить'>
       <IconButton color='secondary' component='button' {...rest}>
         <ClearIcon style={iconStyle} />
       </IconButton>
@@ -52,29 +60,11 @@ export function DeleteBtn({ title = 'Удалить', iconStyle, ...rest }: MyIc
   );
 }
 
-export function RefreshBtn({
-  title = 'Обновить',
-  iconStyle,
-  ...rest
-}: MyIconButtonProps) {
+export function RefreshButton({ iconStyle, ...rest }: MyIconButtonProps) {
   return (
-    <Tooltip title={title}>
+    <Tooltip title='Обновить'>
       <IconButton color='primary' component='button' {...rest}>
         <RefreshIcon style={iconStyle} />
-      </IconButton>
-    </Tooltip>
-  );
-}
-
-export function RestoreBtn({
-  title = 'Восстановить вид',
-  iconStyle = { width: 35, height: 35 },
-  ...rest
-}: MyIconButtonProps) {
-  return (
-    <Tooltip title={title}>
-      <IconButton color='primary' component='button' {...rest}>
-        <ViewModuleIcon style={iconStyle} />
       </IconButton>
     </Tooltip>
   );

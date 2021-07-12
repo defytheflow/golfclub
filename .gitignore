@@ -87,4 +87,7 @@ typings/
 
 # Electron-Forge
 out/
+
+# Custom
 data/
+script.js
