@@ -26,8 +26,6 @@ interface CellProps {
 export const Cell = React.memo((props: CellProps) => {
   const { row, value, field, onBlur, onClick, onChange, error = false, edited } = props;
   let content;
-  // console.log('render Cell', row._id, field, value);
-  console.log('rendered this component');
 
   const inputProps: TextFieldProps = {
     autoFocus: true,

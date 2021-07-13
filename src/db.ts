@@ -4,14 +4,12 @@ import { readFileSync } from 'fs';
 import { app } from 'electron';
 import Datastore from 'nedb-promises';
 
+import log from './logging';
 import { Row } from './types';
 
 function dbFactory(filename: string, options = {}) {
-  return Datastore.create({
-    filename: path.join(app.getAppPath(), 'data', filename),
-    autoload: true,
-    ...options,
-  });
+  const dbPath = path.join(app.getAppPath(), 'data', filename);
+  return Datastore.create({ filename: dbPath, autoload: true, ...options });
 }
 
 function loadPlayers() {
@@ -19,11 +17,11 @@ function loadPlayers() {
   const lines = readFileSync('players.csv', 'utf8').split('\r\n');
 
   for (let i = 1; i < lines.length - 1; i++) {
-    const line = lines[i].trim().split(';');
-    const number = line[0]?.trim();
-    const name = line[1]?.replace('.', '')?.trim();
-    const gender = normalizeGender(line[3]?.trim().toLowerCase());
-    const hi = line[4]?.trim().replace(',', '.');
+    const line = lines[i].split(';').map(word => word.trim());
+    const number = line[0];
+    const name = line[1]?.replace('.', '');
+    const gender = normalizeGender(line[3]);
+    const hi = line[4]?.replace(',', '.');
     players.push({ number, name, gender, hi });
   }
 
@@ -31,6 +29,7 @@ function loadPlayers() {
 }
 
 function normalizeGender(gender?: string) {
+  gender = gender.toLowerCase();
   if (gender === 'м') return 'Муж.';
   if (gender === 'ж') return 'Жен.';
   return gender;
@@ -49,14 +48,18 @@ const defaultColumns = [
 export default {
   rows: dbFactory('rows.db', { timestampData: true }),
   columns: dbFactory('columns.db'),
-  async init() {
+  async init(cb = () => {}) {
     const rows = await this.rows.find({});
     if (rows.length === 0) {
       this.rows.insert(loadPlayers());
     }
+
     const columns = await this.columns.find({});
     if (columns.length === 0) {
       this.columns.insert(defaultColumns);
     }
+
+    log('db.init FINISHED');
+    cb();
   },
 };

@@ -1,6 +1,9 @@
+import path from 'path';
+
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import db from './db';
+import log from './logging';
 import { DBAction } from './types';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -17,19 +20,23 @@ function createWindow() {
   win = new BrowserWindow({
     width: 900,
     height: 900,
+    icon: path.join(__dirname, 'assets', 'icon.png'),
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
   win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  win.webContents.openDevTools();
-  db.init();
+  if (process.env.NODE_ENV === 'development') {
+    win.webContents.openDevTools();
+  }
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', async () => {
+  db.init(createWindow);
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -49,11 +56,15 @@ app.on('activate', () => {
 });
 
 ipcMain.on('toMain', async (event, action: DBAction) => {
+  log('IPC MAIN RAN');
   switch (action.type) {
     case 'load': {
       const rows = await db.rows.find({}).sort({ createdAt: 1 });
       const columns = await db.columns.find({}).sort({ order: 1 });
-      win.webContents.send('fromMain', { type: action.type, payload: { rows, columns } });
+      win.webContents.send('fromMain', {
+        type: action.type,
+        payload: { rows, columns },
+      });
       break;
     }
     case 'insert_row': {

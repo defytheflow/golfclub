@@ -104,6 +104,7 @@ const useTableStyles = makeStyles({
 // TODO: when aplication is launched refresh the data.
 // TODO: display what shortcults and help message for new users.
 // TODO: add ctr+f like in firefox.
+// TODO: first column is too small. table has horizontal scroll at the launch of application
 function App() {
   const [state, dispatch] = React.useReducer(tableReducer, {
     rows: [],
@@ -227,7 +228,11 @@ function App() {
   const classes = useTableStyles({ tableWidth });
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        <h1>Загрузка...</h1>
+      </div>
+    );
   }
 
   return (
