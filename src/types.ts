@@ -40,6 +40,7 @@ export type DBAction =
 
 export type Row = {
   _id?: string;
+  order: number;
   number: string;
   name: string;
   gender: string;
@@ -48,7 +49,7 @@ export type Row = {
 
 export type Column = {
   _id?: string;
+  order: number;
   width: number;
   percent?: number;
-  order: number;
 };

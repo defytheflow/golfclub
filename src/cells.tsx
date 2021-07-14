@@ -65,10 +65,11 @@ export const Cell = React.memo((props: CellProps) => {
 
 export function PercentCell({ row, column }: PercentCellProps) {
   const hiNumber = Number(row.hi);
-  // console.log('render PercentCell');
   return (
     <TableCell align='center'>
-      {isNaN(hiNumber) || row.hi === null ? '-' : (hiNumber * column.percent) / 100}
+      {isNaN(hiNumber) || row.hi === null
+        ? '-'
+        : ((hiNumber * column.percent) / 100).toFixed(2)}
     </TableCell>
   );
 }

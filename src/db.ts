@@ -29,7 +29,7 @@ function loadPlayers() {
     const name = line[1]?.replace('.', '');
     const gender = normalizeGender(line[3]);
     const hi = line[4]?.replace(',', '.');
-    players.push({ number, name, gender, hi });
+    players.push({ order: i, number, name, gender, hi });
   }
 
   return players;
@@ -53,7 +53,7 @@ const defaultColumns = [
 ];
 
 export default {
-  rows: dbFactory('rows.db', { timestampData: true }),
+  rows: dbFactory('rows.db'),
   columns: dbFactory('columns.db'),
   async init(cb = () => {}) {
     const rows = await this.rows.find({});

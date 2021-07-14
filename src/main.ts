@@ -56,7 +56,7 @@ ipcMain.on('toMain', async (event, action: DBAction) => {
   log('IPC MAIN RAN');
   switch (action.type) {
     case 'load': {
-      const rows = await db.rows.find({}).sort({ createdAt: 1 });
+      const rows = await db.rows.find({}).sort({ order: 1 });
       const columns = await db.columns.find({}).sort({ order: 1 });
       win.webContents.send('fromMain', { type: action.type, payload: { rows, columns } });
       break;

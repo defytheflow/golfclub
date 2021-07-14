@@ -13,17 +13,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AddButton, DeleteButton, RefreshButton } from './buttons';
 import { Cell, PercentCell, PercentHeader } from './cells';
 import { Row, Column, DBAction } from './types';
-import { sum } from './utils';
+import { sum, sortedIndex } from './utils';
 
 type EditedCell = {
   id: Row['_id'] | Column['_id'] | null;
   field: string | null;
 };
 
+type HistoryEntry = (Row & { type: 'row' }) | (Column & { type: 'column' });
+
 type TableState = {
   rows: Row[];
   columns: Column[];
-  history: Row[];
+  history: HistoryEntry[];
   editedCell: EditedCell;
   status: 'idle' | 'loading';
 };
@@ -31,7 +33,7 @@ type TableState = {
 type TableAction =
   | DBAction
   | { type: 'edit_cell'; payload: EditedCell }
-  | { type: 'undo_row' };
+  | { type: 'undo' };
 
 function tableReducer(state: TableState, action: TableAction): TableState {
   switch (action.type) {
@@ -39,7 +41,11 @@ function tableReducer(state: TableState, action: TableAction): TableState {
       return { ...state, ...action.payload, status: 'idle' };
     }
     case 'insert_row': {
-      return { ...state, rows: [...state.rows, action.payload] };
+      const index = sortedIndex(state.rows, action.payload, (a, b) => a.order - b.order);
+      return {
+        ...state,
+        rows: [...state.rows.slice(0, index), action.payload, ...state.rows.slice(index)],
+      };
     }
     case 'update_row': {
       const { _id, ...data } = action.payload;
@@ -47,14 +53,27 @@ function tableReducer(state: TableState, action: TableAction): TableState {
       return { ...state, editedCell: { id: null, field: null }, rows };
     }
     case 'remove_row': {
-      const row = state.rows.find(row => row._id === action.payload);
-      const newRows = state.rows.filter(row => row._id !== action.payload);
-      return { ...state, rows: newRows, history: [...state.history, row] };
+      const rowIndex = state.rows.findIndex(row => row._id === action.payload);
+      return {
+        ...state,
+        rows: [...state.rows.slice(0, rowIndex), ...state.rows.slice(rowIndex + 1)],
+        history: [...state.history, { ...state.rows[rowIndex], type: 'row' }],
+      };
     }
     case 'insert_column': {
-      const columns = state.columns.slice(0, -1);
-      const last = state.columns.slice(-1);
-      return { ...state, columns: [...columns, action.payload, ...last] };
+      const index = sortedIndex(
+        state.columns,
+        action.payload,
+        (a, b) => a.order - b.order
+      );
+      return {
+        ...state,
+        columns: [
+          ...state.columns.slice(0, index),
+          action.payload,
+          ...state.columns.slice(index),
+        ],
+      };
     }
     case 'update_column': {
       const { _id, ...data } = action.payload;
@@ -64,27 +83,26 @@ function tableReducer(state: TableState, action: TableAction): TableState {
       return { ...state, editedCell: { id: null, field: null }, columns };
     }
     case 'remove_column': {
-      const columns = state.columns.filter(column => column._id !== action.payload);
-      return { ...state, columns };
+      const columnIndex = state.columns.findIndex(
+        column => column._id === action.payload
+      );
+      return {
+        ...state,
+        columns: [
+          ...state.columns.slice(0, columnIndex),
+          ...state.columns.slice(columnIndex + 1),
+        ],
+        history: [...state.history, { ...state.columns[columnIndex], type: 'column' }],
+      };
     }
     case 'edit_cell': {
       return { ...state, editedCell: action.payload };
     }
-    case 'undo_row': {
+    case 'undo': {
       return { ...state, history: state.history.slice(0, -1) };
     }
   }
 }
-
-// const defaultColumns = [
-//   { _id: '1', width: 50 },
-//   { _id: '2', width: 100 },
-//   { _id: '3', width: 325 },
-//   { _id: '4', width: 75 },
-//   { _id: '5', width: 75 },
-//   { _id: '6', width: 75, percent: 25 },
-//   { _id: '7', width: 100 },
-// ];
 
 const useTableStyles = makeStyles({
   container: {
@@ -95,16 +113,12 @@ const useTableStyles = makeStyles({
   },
 });
 
-// TODO: ctrl+z in the same place where it was before.
-// TODO: if user adds a new line and presses ctrl + z it is deleted.
-// TODO: ctrl+z remove add column too.
-// every action is ctrl+z attable.
 // TODO: validation number and hi validation.
 // TODO: ctrl + r to reload the whole thing.
 // TODO: when aplication is launched refresh the data.
 // TODO: display what shortcults and help message for new users.
 // TODO: add ctr+f like in firefox.
-// TODO: first column is too small. table has horizontal scroll at the launch of application
+// TODO: first column is too small. table has horizontal scroll at the launch of application on windows.
 function App() {
   const [state, dispatch] = React.useReducer(tableReducer, {
     rows: [],
@@ -118,7 +132,9 @@ function App() {
   const tableWidth = sum(columns.map(column => column.width));
   const containerRef = React.useRef<HTMLDivElement>(null);
   const percentColumns = columns.filter(column => column.percent);
-  const columnNames = ['number', 'name', 'gender', 'hi'] as Array<keyof Row>;
+  const columnNames = ['number', 'name', 'gender', 'hi'] as Array<
+    Exclude<keyof Row, 'order'>
+  >;
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'load' });
@@ -126,23 +142,33 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    function undoRow() {
-      const lastRow = state.history.slice(-1)[0];
-      window.api.send('toMain', { type: 'insert_row', payload: lastRow });
-      dispatch({ type: 'undo_row' });
+    function undo() {
+      const lastEntry = state.history.slice(-1)[0];
+
+      if (lastEntry.type === 'row') {
+        delete lastEntry.type;
+        window.api.send('toMain', { type: 'insert_row', payload: lastEntry });
+      } else if (lastEntry.type === 'column') {
+        delete lastEntry.type;
+        window.api.send('toMain', { type: 'insert_column', payload: lastEntry });
+      }
+
+      dispatch({ type: 'undo' });
     }
+
     function handleKeyPress(e: KeyboardEvent) {
       if (
         e.key === 'z' &&
         ((e.ctrlKey && window.platform !== 'darwin') ||
           (e.metaKey && window.platform === 'darwin'))
       ) {
-        if (state.history.length) undoRow();
+        if (state.editedCell.id === null && state.history.length) undo();
       }
     }
+
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [state.history]);
+  }, [state.editedCell.id, state.history]);
 
   React.useEffect(() => {
     containerRef.current?.scrollBy(1000, 0);
@@ -153,9 +179,10 @@ function App() {
   }
 
   function insertRow() {
+    const prevOrder = rows[rows.length - 1].order;
     window.api.send('toMain', {
       type: 'insert_row',
-      payload: createRow('', '', '', ''),
+      payload: createRow(prevOrder + 1, '', '', '', ''),
     });
   }
 
@@ -307,8 +334,14 @@ function App() {
   );
 }
 
-function createRow(number: string, name: string, gender: string, hi: string) {
-  return { number, name, gender, hi };
+function createRow(
+  order: number,
+  number: string,
+  name: string,
+  gender: string,
+  hi: string
+) {
+  return { order, number, name, gender, hi };
 }
 
 function createColumn(order: number, width: number, percent?: number) {
