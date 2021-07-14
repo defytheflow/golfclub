@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { app, BrowserWindow, ipcMain } from 'electron';
 
 import db from './db';
@@ -20,7 +18,6 @@ function createWindow() {
   win = new BrowserWindow({
     width: 900,
     height: 900,
-    icon: path.join(__dirname, 'assets', 'icon.png'),
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
@@ -61,10 +58,7 @@ ipcMain.on('toMain', async (event, action: DBAction) => {
     case 'load': {
       const rows = await db.rows.find({}).sort({ createdAt: 1 });
       const columns = await db.columns.find({}).sort({ order: 1 });
-      win.webContents.send('fromMain', {
-        type: action.type,
-        payload: { rows, columns },
-      });
+      win.webContents.send('fromMain', { type: action.type, payload: { rows, columns } });
       break;
     }
     case 'insert_row': {

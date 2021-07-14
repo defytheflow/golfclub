@@ -13,8 +13,15 @@ function dbFactory(filename: string, options = {}) {
 }
 
 function loadPlayers() {
+  const resourcesPath =
+    process.env.NODE_ENV === 'production'
+      ? process.resourcesPath
+      : path.join(app.getAppPath(), 'src', 'assets');
+
   const players: Row[] = [];
-  const lines = readFileSync('players.csv', 'utf8').split('\r\n');
+  const csvPath = path.join(resourcesPath, 'players.csv');
+  log('csvPath is', csvPath);
+  const lines = readFileSync(csvPath, 'utf8').split('\r\n');
 
   for (let i = 1; i < lines.length - 1; i++) {
     const line = lines[i].split(';').map(word => word.trim());

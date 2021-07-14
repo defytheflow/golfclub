@@ -6,7 +6,7 @@ import { app } from 'electron';
 import chalk from 'chalk';
 
 const LOG_FILE = fs.createWriteStream(path.join(app.getAppPath(), 'debug.log'), {
-  flags: 'w',
+  flags: 'a',
 });
 
 export default function log(...args: unknown[]) {

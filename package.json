@@ -20,7 +20,10 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "src/assets/icon.icns"
+        "icon": "src/assets/icon.icns",
+        "extraResource": [
+          "src/assets/players.csv"
+        ]
       },
       "makers": [
         {
