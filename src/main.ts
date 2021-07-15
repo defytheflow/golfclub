@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 
 import db from './db';
-import log from './logging';
+// import log from './logging';
 import { DBAction } from './types';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -53,12 +53,16 @@ app.on('activate', () => {
 });
 
 ipcMain.on('toMain', async (event, action: DBAction) => {
-  log('IPC MAIN RAN');
+  // log('IPC MAIN RAN');
   switch (action.type) {
     case 'load': {
       const rows = await db.rows.find({}).sort({ order: 1 });
       const columns = await db.columns.find({}).sort({ order: 1 });
-      win.webContents.send('fromMain', { type: action.type, payload: { rows, columns } });
+      const user = await db.user.findOne({});
+      win.webContents.send('fromMain', {
+        type: action.type,
+        payload: { rows, columns, user },
+      });
       break;
     }
     case 'insert_row': {
@@ -93,5 +97,109 @@ ipcMain.on('toMain', async (event, action: DBAction) => {
       win.webContents.send('fromMain', action);
       break;
     }
+    case 'update_user': {
+      const { _id, ...data } = action.payload;
+      await db.user.update({ _id }, data);
+      win.webContents.send('fromMain', action);
+      break;
+    }
   }
 });
+
+const isMac = process.platform === 'darwin';
+
+const template = [
+  // { role: 'appMenu' }
+  ...(isMac
+    ? [
+        {
+          label: app.name,
+          submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideothers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' },
+          ],
+        },
+      ]
+    : []),
+  // { role: 'fileMenu' }
+  {
+    label: 'File',
+    submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
+  },
+  // { role: 'editMenu' }
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      ...(isMac
+        ? [
+            { role: 'pasteAndMatchStyle' },
+            { role: 'delete' },
+            { role: 'selectAll' },
+            { type: 'separator' },
+            {
+              label: 'Speech',
+              submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }],
+            },
+          ]
+        : [{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }]),
+    ],
+  },
+  // { role: 'viewMenu' }
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forceReload' },
+      { role: 'toggleDevTools' },
+      { type: 'separator' },
+      { role: 'resetZoom' },
+      { role: 'zoomIn' },
+      { role: 'zoomOut' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' },
+    ],
+  },
+  // { role: 'windowMenu' }
+  {
+    label: 'Window',
+    submenu: [
+      { role: 'minimize' },
+      { role: 'zoom' },
+      ...(isMac
+        ? [
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' },
+          ]
+        : [{ role: 'close' }]),
+    ],
+  },
+  {
+    role: 'help',
+    submenu: [
+      {
+        label: 'Инструкция',
+        click() {
+          win.webContents.send('fromMain', { type: 'show_help' });
+        },
+      },
+    ],
+  },
+];
+
+const menu = Menu.buildFromTemplate(template as any);
+Menu.setApplicationMenu(menu);

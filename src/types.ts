@@ -11,7 +11,7 @@ declare global {
 export type DBAction =
   | {
       type: 'load';
-      payload?: { rows: Row[]; columns: Column[] };
+      payload?: { rows: Row[]; columns: Column[]; user: User };
     }
   | {
       type: 'insert_row';
@@ -36,6 +36,10 @@ export type DBAction =
   | {
       type: 'remove_column';
       payload: Column['_id'];
+    }
+  | {
+      type: 'update_user';
+      payload: User;
     };
 
 export type Row = {
@@ -52,4 +56,9 @@ export type Column = {
   order: number;
   width: number;
   percent?: number;
+};
+
+export type User = {
+  _id?: string;
+  showHelp: boolean;
 };

@@ -9,10 +9,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
+import Modal, { ModalProps } from '@material-ui/core/Modal';
 
 import { AddButton, DeleteButton, RefreshButton } from './buttons';
 import { Cell, PercentCell, PercentHeader } from './cells';
-import { Row, Column, DBAction } from './types';
+import { Row, Column, User, DBAction } from './types';
 import { cleanValue, sum, sortedIndex } from './utils';
 
 type EditedCell = {
@@ -28,17 +29,26 @@ type TableState = {
   history: HistoryEntry[];
   editedCell: EditedCell;
   status: 'idle' | 'loading';
+  showHelp: boolean;
+  user: User;
 };
 
 type TableAction =
   | DBAction
   | { type: 'edit_cell'; payload: EditedCell }
-  | { type: 'undo' };
+  | { type: 'undo' }
+  | { type: 'show_help' }
+  | { type: 'close_help' };
 
 function tableReducer(state: TableState, action: TableAction): TableState {
   switch (action.type) {
     case 'load': {
-      return { ...state, ...action.payload, status: 'idle' };
+      return {
+        ...state,
+        ...action.payload,
+        status: 'idle',
+        showHelp: action.payload.user.showHelp,
+      };
     }
     case 'insert_row': {
       const index = sortedIndex(state.rows, action.payload, (a, b) => a.order - b.order);
@@ -101,6 +111,15 @@ function tableReducer(state: TableState, action: TableAction): TableState {
     case 'undo': {
       return { ...state, history: state.history.slice(0, -1) };
     }
+    case 'show_help': {
+      return { ...state, showHelp: true };
+    }
+    case 'close_help': {
+      return { ...state, showHelp: false };
+    }
+    case 'update_user': {
+      return { ...state, user: action.payload };
+    }
   }
 }
 
@@ -118,6 +137,9 @@ const useTableStyles = makeStyles({
 // TODO: display what shortcults and help message for new users.
 // TODO: add ctr+f like in firefox.
 // TODO: first column is too small. table has horizontal scroll at the launch of application on windows.
+
+// TODO: add modal that shows up with help message and tick and if you tick then it will never show.
+// TODO: display modal when user presses help -> instructinon on native menu.
 function App() {
   const [state, dispatch] = React.useReducer(tableReducer, {
     rows: [],
@@ -125,9 +147,11 @@ function App() {
     history: [],
     editedCell: { id: null, field: null },
     status: 'loading',
+    showHelp: false,
+    user: { showHelp: false },
   });
 
-  const { rows, columns, editedCell, status } = state;
+  const { rows, columns, editedCell, status, showHelp, user } = state;
   const tableWidth = sum(columns.map(column => column.width));
   const percentColumns = columns.filter(column => 'percent' in column);
   const columnNames = ['number', 'name', 'gender', 'hi'] as Array<
@@ -137,6 +161,12 @@ function App() {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const runScrollEffectRef = React.useRef(false);
   const removedRowInProcessRef = React.useRef<string | null>(null);
+
+  // React.useEffect(() => {
+  //   if (user.showHelp) {
+  //     dispatch({ type: 'show_help' });
+  //   }
+  // }, [user.showHelp]);
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'load' });
@@ -210,7 +240,6 @@ function App() {
   }
 
   function updateColumn(columnID: Column['_id'], value: number) {
-    console.log('updateColumn', { value });
     const column = columns.find(column => column._id === columnID);
 
     if (column.percent !== value) {
@@ -274,6 +303,18 @@ function App() {
 
   return (
     <>
+      <HelpModal
+        open={showHelp}
+        onClose={() => dispatch({ type: 'close_help' })}
+        onInputChange={value => {
+          window.api.send('toMain', {
+            type: 'update_user',
+            payload: { ...user, showHelp: !value },
+          });
+          dispatch({ type: 'close_help' });
+        }}
+        checked={!user.showHelp}
+      />
       <TableContainer component={Paper} className={classes.container} ref={containerRef}>
         <Table size='small' className={classes.table}>
           <colgroup>
@@ -340,6 +381,55 @@ function App() {
         <AddButton iconStyle={{ width: 35, height: 35 }} onClick={insertRow} />
       </div>
     </>
+  );
+}
+
+interface HelpModalProps extends Omit<ModalProps, 'children'> {
+  checked: boolean;
+  onInputChange: (value: boolean) => void;
+}
+
+function HelpModal({ checked, onInputChange, onClose, ...rest }: HelpModalProps) {
+  const [isChecked, setChecked] = React.useState(checked);
+  return (
+    <Modal
+      {...rest}
+      onClose={(event, reason) => {
+        if (isChecked !== checked) {
+          onInputChange(isChecked);
+        }
+        onClose(event, reason);
+      }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <div
+        style={{
+          backgroundColor: 'white',
+          padding: 20,
+          borderRadius: 5,
+          outline: 0,
+        }}>
+        <h1>Инструкция</h1>
+        <p>...</p>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+          }}>
+          <input
+            id='show-help'
+            type='checkbox'
+            onChange={e => setChecked(e.target.checked)}
+            checked={isChecked}
+          />
+          <label htmlFor='show-help'>Больше не показывать</label>
+        </div>
+      </div>
+    </Modal>
   );
 }
 

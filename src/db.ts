@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { app } from 'electron';
 import Datastore from 'nedb-promises';
 
-import log from './logging';
+// import log from './logging';
 import { Row } from './types';
 
 function dbFactory(filename: string, options = {}) {
@@ -20,7 +20,7 @@ function loadPlayers() {
 
   const players: Row[] = [];
   const csvPath = path.join(resourcesPath, 'players.csv');
-  log('csvPath is', csvPath);
+  // log('csvPath is', csvPath);
   const lines = readFileSync(csvPath, 'utf8').split('\r\n');
 
   for (let i = 1; i < lines.length - 1; i++) {
@@ -55,6 +55,7 @@ const defaultColumns = [
 export default {
   rows: dbFactory('rows.db'),
   columns: dbFactory('columns.db'),
+  user: dbFactory('user.db'),
   async init(cb = () => {}) {
     const rows = await this.rows.find({});
     if (rows.length === 0) {
@@ -66,7 +67,12 @@ export default {
       this.columns.insert(defaultColumns);
     }
 
-    log('db.init FINISHED');
+    const user = await this.user.findOne({});
+    if (user === null) {
+      this.user.insert({ showHelp: true });
+    }
+
+    // log('db.init FINISHED');
     cb();
   },
 };
