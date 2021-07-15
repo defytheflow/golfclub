@@ -25,10 +25,10 @@ function loadPlayers() {
 
   for (let i = 1; i < lines.length - 1; i++) {
     const line = lines[i].split(';').map(word => word.trim());
-    const number = line[0];
+    const number = line[0].substr(2);
     const name = line[1]?.replace('.', '');
     const gender = normalizeGender(line[3]);
-    const hi = line[4]?.replace(',', '.');
+    const hi = Number(line[4]?.replace(',', '.')).toFixed(2);
     players.push({ order: i, number, name, gender, hi });
   }
 

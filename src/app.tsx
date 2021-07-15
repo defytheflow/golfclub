@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AddButton, DeleteButton, RefreshButton } from './buttons';
 import { Cell, PercentCell, PercentHeader } from './cells';
 import { Row, Column, DBAction } from './types';
-import { sum, sortedIndex } from './utils';
+import { cleanValue, sum, sortedIndex } from './utils';
 
 type EditedCell = {
   id: Row['_id'] | Column['_id'] | null;
@@ -106,14 +106,13 @@ function tableReducer(state: TableState, action: TableAction): TableState {
 
 const useTableStyles = makeStyles({
   container: {
-    maxWidth: (props: any) => props.tableWidth + 25,
+    maxWidth: (props: { tableWidth: number }) => props.tableWidth + 25,
   },
   table: {
-    width: (props: any) => props.tableWidth + 25,
+    width: (props: { tableWidth: number }) => props.tableWidth + 25,
   },
 });
 
-// TODO: validation number and hi validation.
 // TODO: ctrl + r to reload the whole thing.
 // TODO: when aplication is launched refresh the data.
 // TODO: display what shortcults and help message for new users.
@@ -130,11 +129,14 @@ function App() {
 
   const { rows, columns, editedCell, status } = state;
   const tableWidth = sum(columns.map(column => column.width));
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const percentColumns = columns.filter(column => column.percent);
+  const percentColumns = columns.filter(column => 'percent' in column);
   const columnNames = ['number', 'name', 'gender', 'hi'] as Array<
     Exclude<keyof Row, 'order'>
   >;
+
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const runScrollEffectRef = React.useRef(false);
+  const removedRowInProcessRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'load' });
@@ -171,7 +173,12 @@ function App() {
   }, [state.editedCell.id, state.history]);
 
   React.useEffect(() => {
-    containerRef.current?.scrollBy(1000, 0);
+    if (columns.length) {
+      if (runScrollEffectRef.current) {
+        containerRef.current?.scrollBy(1000, 0);
+      }
+      runScrollEffectRef.current = true;
+    }
   }, [columns.length]);
 
   function refresh() {
@@ -187,7 +194,11 @@ function App() {
   }
 
   function removeRow(rowID: Row['_id']) {
+    if (removedRowInProcessRef.current === rowID) {
+      return;
+    }
     window.api.send('toMain', { type: 'remove_row', payload: rowID });
+    removedRowInProcessRef.current = rowID;
   }
 
   function insertColumn() {
@@ -199,24 +210,28 @@ function App() {
   }
 
   function updateColumn(columnID: Column['_id'], value: number) {
+    console.log('updateColumn', { value });
     const column = columns.find(column => column._id === columnID);
-    window.api.send('toMain', {
-      type: 'update_column',
-      payload: { ...column, percent: value },
-    });
-    // dispatch({ type: 'update_column', payload: { ...column, percent: value } });
+
+    if (column.percent !== value) {
+      window.api.send('toMain', {
+        type: 'update_column',
+        payload: { ...column, percent: value },
+      });
+    } else {
+      dispatch({ type: 'edit_cell', payload: { id: null, field: null } });
+    }
   }
 
   function removeColumn(columnID: Column['_id']) {
     window.api.send('toMain', { type: 'remove_column', payload: columnID });
-    // dispatch({ type: 'remove_column', payload: columnID });
   }
 
   const updateRow = React.useCallback((row: Row, field: keyof Row, value: string) => {
     if (row[field] !== value) {
       window.api.send('toMain', {
         type: 'update_row',
-        payload: { ...row, [field]: value.trim() },
+        payload: { ...row, [field]: cleanValue(field, value) },
       });
     } else {
       dispatch({ type: 'edit_cell', payload: { id: null, field: null } });
@@ -229,12 +244,7 @@ function App() {
 
   const handleBlur = React.useCallback(
     (e: React.FocusEvent<HTMLInputElement>, row: Row) => {
-      let { name, value } = e.target; // eslint-disable-line
-
-      if (name === 'hi') {
-        value = value.replace(',', '.');
-      }
-
+      const { name, value } = e.target;
       if (value !== undefined) {
         updateRow(row, name as keyof Row, value);
       }
@@ -244,8 +254,8 @@ function App() {
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, row: Row) => {
-      const { value } = e.target;
-      if (value !== undefined) {
+      const { name, value } = e.target;
+      if (name === 'gender' && value !== undefined) {
         updateRow(row, 'gender', value);
       }
     },
@@ -310,7 +320,6 @@ function App() {
                       onBlur={handleBlur}
                       onClick={handleClick}
                       onChange={handleChange}
-                      error={isNaN(+row.hi) && row.hi !== '-'}
                     />
                   );
                 })}
