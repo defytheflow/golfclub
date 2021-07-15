@@ -7,6 +7,8 @@ import { DBAction } from './types';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+const isMac = process.platform === 'darwin';
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -16,10 +18,11 @@ let win: BrowserWindow;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 900,
+    width: isMac ? 900 : 920,
     height: 900,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      webSecurity: false,
     },
   });
   win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -105,8 +108,6 @@ ipcMain.on('toMain', async (event, action: DBAction) => {
     }
   }
 });
-
-const isMac = process.platform === 'darwin';
 
 const template = [
   // { role: 'appMenu' }

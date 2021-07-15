@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import axios from 'axios';
+
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -10,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal, { ModalProps } from '@material-ui/core/Modal';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { AddButton, DeleteButton, RefreshButton } from './buttons';
 import { Cell, PercentCell, PercentHeader } from './cells';
@@ -27,6 +30,7 @@ type TableState = {
   rows: Row[];
   columns: Column[];
   history: HistoryEntry[];
+  fetching: Array<Row['_id']>;
   editedCell: EditedCell;
   status: 'idle' | 'loading';
   showHelp: boolean;
@@ -38,7 +42,11 @@ type TableAction =
   | { type: 'edit_cell'; payload: EditedCell }
   | { type: 'undo' }
   | { type: 'show_help' }
-  | { type: 'close_help' };
+  | { type: 'close_help' }
+  | { type: 'fetch_row'; payload: Row['_id'] }
+  | { type: 'fetch_rows'; payload: number }
+  | { type: 'resolve_row'; payload: Row['_id'] }
+  | { type: 'reject_row'; payload: Row['_id'] };
 
 function tableReducer(state: TableState, action: TableAction): TableState {
   switch (action.type) {
@@ -120,6 +128,23 @@ function tableReducer(state: TableState, action: TableAction): TableState {
     case 'update_user': {
       return { ...state, user: action.payload };
     }
+    case 'fetch_row': {
+      return { ...state, fetching: [...state.fetching, action.payload] };
+    }
+    case 'fetch_rows': {
+      return {
+        ...state,
+        fetching: state.rows.slice(0, action.payload).map(row => row._id),
+      };
+    }
+    case 'resolve_row': {
+      // do extra stuff.
+      return { ...state, fetching: state.fetching.filter(id => id !== action.payload) };
+    }
+    case 'reject_row': {
+      // do extra stuff.
+      return { ...state, fetching: state.fetching.filter(id => id !== action.payload) };
+    }
   }
 }
 
@@ -132,26 +157,24 @@ const useTableStyles = makeStyles({
   },
 });
 
-// TODO: ctrl + r to reload the whole thing.
-// TODO: when aplication is launched refresh the data.
-// TODO: display what shortcults and help message for new users.
+// TODO: add cancel refresh on second refresh click.
+// TODO: horizontal scroll when a lot of columns.
 // TODO: add ctr+f like in firefox.
-// TODO: first column is too small. table has horizontal scroll at the launch of application on windows.
-
-// TODO: add modal that shows up with help message and tick and if you tick then it will never show.
-// TODO: display modal when user presses help -> instructinon on native menu.
+// TODO: fix bug can not update fields while refreshing.
+// TODO: fix empty rows shouuld not load and display spinner.
 function App() {
   const [state, dispatch] = React.useReducer(tableReducer, {
     rows: [],
     columns: [],
     history: [],
+    fetching: [],
     editedCell: { id: null, field: null },
     status: 'loading',
     showHelp: false,
     user: { showHelp: false },
   });
 
-  const { rows, columns, editedCell, status, showHelp, user } = state;
+  const { rows, columns, fetching, editedCell, status, showHelp, user } = state;
   const tableWidth = sum(columns.map(column => column.width));
   const percentColumns = columns.filter(column => 'percent' in column);
   const columnNames = ['number', 'name', 'gender', 'hi'] as Array<
@@ -161,12 +184,6 @@ function App() {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const runScrollEffectRef = React.useRef(false);
   const removedRowInProcessRef = React.useRef<string | null>(null);
-
-  // React.useEffect(() => {
-  //   if (user.showHelp) {
-  //     dispatch({ type: 'show_help' });
-  //   }
-  // }, [user.showHelp]);
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'load' });
@@ -211,8 +228,60 @@ function App() {
     }
   }, [columns.length]);
 
-  function refresh() {
-    console.log('Refreshing all');
+  async function refresh() {
+    const count = rows.length;
+    dispatch({ type: 'fetch_rows', payload: count });
+
+    // super cool errors cna happen here...
+    const parser = new DOMParser();
+    const res = await axios.get('https://hcp.rusgolf.ru/public/player/ru/');
+    const html = parser.parseFromString(res.data, 'text/html');
+    const csrfToken = (html.querySelector('#form__token') as HTMLInputElement).value;
+
+    // console.time('timer');
+    for (const row of rows.slice(0, count)) {
+      // dispatch({ type: 'fetch_row', payload: row._id });
+      if (!row.number) {
+        return;
+      }
+
+      axios
+        .get('https://hcp.rusgolf.ru/public/player/ru/', {
+          params: {
+            'form[search]': 'RU' + row.number,
+            'form[_token]': csrfToken,
+          },
+        })
+        .then(res => {
+          const html = parser.parseFromString(res.data, 'text/html');
+          const trs = html.querySelectorAll('tr');
+          const tr = trs.length === 2 ? trs[1] : null;
+          if (tr) {
+            const tds = tr.querySelectorAll('td');
+            const number = tds[0].innerText.trim().substr(2);
+            const name = tds[1].innerText.replace('.', '').trim();
+            const gender = tds[2].innerText.trim();
+
+            let hi = tds[3].innerText.trim().replace(',', '.');
+            hi = hi === '-' ? hi : Number(hi).toFixed(2);
+
+            window.api.send('toMain', {
+              type: 'update_row',
+              payload: { ...row, number, name, gender, hi },
+            });
+
+            dispatch({ type: 'resolve_row', payload: row._id });
+            // console.log(tr.innerText.replace(/\s+/g, ''));
+          } else {
+            dispatch({ type: 'reject_row', payload: row._id });
+          }
+        })
+        .catch(err => {
+          if (axios.isAxiosError(err)) {
+            dispatch({ type: 'reject_row', payload: row._id });
+          }
+        });
+    }
   }
 
   function insertRow() {
@@ -295,7 +364,7 @@ function App() {
 
   if (status === 'loading') {
     return (
-      <div>
+      <div style={{ padding: '0 2rem' }}>
         <h1>Загрузка...</h1>
       </div>
     );
@@ -315,66 +384,124 @@ function App() {
         }}
         checked={!user.showHelp}
       />
-      <TableContainer component={Paper} className={classes.container} ref={containerRef}>
-        <Table size='small' className={classes.table}>
-          <colgroup>
-            {columns.map(column => (
-              <col key={column._id} width={column.width} />
-            ))}
-          </colgroup>
-          <TableHead>
-            <TableRow>
-              <TableCell align='center'></TableCell>
-              <TableCell align='center'>№</TableCell>
-              <TableCell align='left'>Фамилия, &nbsp;Имя, &nbsp;Отчество</TableCell>
-              <TableCell align='center'>Пол</TableCell>
-              <TableCell align='center'>HI</TableCell>
-              {percentColumns.map((column, i) => (
-                <PercentHeader
-                  key={column._id}
-                  column={column}
-                  deletable={i !== 0}
-                  edited={editedCell.id === column._id && editedCell.field === null}
-                  onEdit={() => handleClick(column._id, null)}
-                  onUpdate={value => updateColumn(column._id, Number(value))}
-                  onDelete={() => removeColumn(column._id)}
-                />
+      <div style={{ display: 'flex' }}>
+        <ul
+          style={{
+            listStyleType: 'none',
+            padding: 0,
+            marginTop: 52,
+            width: 40,
+          }}>
+          {rows.map(row => {
+            const isFetching = fetching.some(id => id === row._id);
+            const isAnyFetching = fetching.length > 0;
+
+            if (isFetching) {
+              return (
+                <li
+                  key={row._id}
+                  style={{
+                    height: 45,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: '0.5rem',
+                    marginLeft: '0.5rem',
+                  }}>
+                  <CircularProgress style={{ height: 15, width: 15 }} />
+                </li>
+              );
+            }
+
+            if (isAnyFetching) {
+              return (
+                <li
+                  key={row._id}
+                  style={{
+                    height: 45,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: '0.5rem',
+                    marginLeft: '0.5rem',
+                  }}></li>
+              );
+            }
+
+            return null;
+          })}
+        </ul>
+        <TableContainer
+          component={Paper}
+          className={classes.container}
+          ref={containerRef}>
+          <Table size='small' className={classes.table}>
+            <colgroup>
+              {columns.map(column => (
+                <col key={column._id} width={column.width} />
               ))}
-              <TableCell align='center'>
-                <AddButton iconStyle={{ width: 29, height: 29 }} onClick={insertColumn} />
-                <RefreshButton onClick={refresh} />
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, i) => (
-              <TableRow key={row._id}>
-                <TableCell align='center'>{i + 1}</TableCell>
-                {columnNames.map(field => {
-                  return (
-                    <Cell
-                      key={field}
-                      row={row}
-                      field={field as keyof Row}
-                      value={row[field]}
-                      edited={editedCell.id === row._id && editedCell.field === field}
-                      onBlur={handleBlur}
-                      onClick={handleClick}
-                      onChange={handleChange}
-                    />
-                  );
-                })}
-                {percentColumns.map(column => (
-                  <PercentCell key={column._id} row={row} column={column} />
+            </colgroup>
+            <TableHead>
+              <TableRow>
+                <TableCell align='center'></TableCell>
+                <TableCell align='center'>№</TableCell>
+                <TableCell align='left'>Фамилия, &nbsp;Имя, &nbsp;Отчество</TableCell>
+                <TableCell align='center'>Пол</TableCell>
+                <TableCell align='center'>HI</TableCell>
+                {percentColumns.map((column, i) => (
+                  <PercentHeader
+                    key={column._id}
+                    column={column}
+                    deletable={i !== 0}
+                    edited={editedCell.id === column._id && editedCell.field === null}
+                    onEdit={() => handleClick(column._id, null)}
+                    onUpdate={value => updateColumn(column._id, Number(value))}
+                    onDelete={() => removeColumn(column._id)}
+                  />
                 ))}
                 <TableCell align='center'>
-                  <DeleteButton onClick={() => removeRow(row._id)} />
+                  <AddButton
+                    iconStyle={{ width: 29, height: 29 }}
+                    onClick={insertColumn}
+                  />
+                  <RefreshButton onClick={refresh} />
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, i) => {
+                const isRowDisabled = fetching.some(id => id === row._id);
+                return (
+                  <TableRow key={row._id}>
+                    <TableCell align='center'>{i + 1}</TableCell>
+                    {columnNames.map(field => {
+                      return (
+                        <Cell
+                          key={field}
+                          row={row}
+                          field={field as keyof Row}
+                          value={row[field]}
+                          edited={editedCell.id === row._id && editedCell.field === field}
+                          disabled={isRowDisabled}
+                          onBlur={handleBlur}
+                          onClick={handleClick}
+                          onChange={handleChange}
+                        />
+                      );
+                    })}
+                    {percentColumns.map(column => (
+                      <PercentCell key={column._id} row={row} column={column} />
+                    ))}
+                    <TableCell align='center'>
+                      <DeleteButton onClick={() => removeRow(row._id)} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
       <div
         style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}
         className={classes.container}>

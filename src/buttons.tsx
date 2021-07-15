@@ -11,10 +11,13 @@ interface MyIconButtonProps extends IconButtonProps {
   iconStyle?: React.CSSProperties;
 }
 
-export function CellButton({ align, children, onClick }: any) {
+export function CellButton({ align, children, ...rest }: any) {
   return (
-    <div
+    <button
+      {...rest}
       style={{
+        backgroundColor: 'transparent',
+        border: 'none',
         width: '100%',
         minHeight: 25,
         display: 'flex',
@@ -22,10 +25,9 @@ export function CellButton({ align, children, onClick }: any) {
         justifyContent: align == 'left' ? 'left' : 'center',
         // cursor: 'pointer',
         // backgroundColor: 'yellow',
-      }}
-      onClick={onClick}>
+      }}>
       {children}
-    </div>
+    </button>
   );
 }
 

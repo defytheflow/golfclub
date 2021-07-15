@@ -13,13 +13,14 @@ interface CellProps {
   value: string;
   field: keyof Row;
   edited: boolean;
+  disabled: boolean;
   onBlur: (e: React.FocusEvent, row: Row) => void;
   onChange: (e: React.ChangeEvent, row: Row) => void;
   onClick: (id: Row['_id'], field: keyof Row) => void;
 }
 
 export const Cell = React.memo((props: CellProps) => {
-  const { row, value, field, edited, onBlur, onClick, onChange } = props;
+  const { row, value, field, edited, disabled, onBlur, onClick, onChange } = props;
   const [inputValue, setInputValue] = React.useState(value);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -70,6 +71,7 @@ export const Cell = React.memo((props: CellProps) => {
         </TextField>
       ) : (
         <CellButton
+          disabled={disabled}
           align={field === 'name' ? 'left' : 'center'}
           onClick={() => onClick(row._id, field)}>
           {field === 'number' && value !== '' ? 'RU' + value : value}
