@@ -35,7 +35,7 @@ function loadPlayers() {
   return players;
 }
 
-function normalizeGender(gender?: string) {
+function normalizeGender(gender: string) {
   gender = gender.toLowerCase();
   if (gender === 'м') return 'Муж.';
   if (gender === 'ж') return 'Жен.';

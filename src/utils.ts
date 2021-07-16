@@ -1,3 +1,4 @@
+import React, { Dispatch, ReducerState, ReducerAction } from 'react';
 import { Row } from './types';
 
 export const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
@@ -43,4 +44,33 @@ export function cleanValue(field: keyof Row, value: string) {
   }
 
   return value;
+}
+
+export function createRow(
+  order: number,
+  number: string,
+  name: string,
+  gender: string,
+  hi: string
+) {
+  return { order, number, name, gender, hi };
+}
+
+export function createColumn(order: number, width: number, percent?: number) {
+  return { order, width, ...(percent && { percent }) };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useReducerLogger<S, D extends React.Dispatch<any>>([state, dispatch]: [
+  S,
+  D
+]): [S, D] {
+  const newDispatch = React.useCallback(
+    action => {
+      console.log('DISPATCH', action);
+      dispatch(action);
+    },
+    [dispatch]
+  );
+  return [state, newDispatch as D];
 }

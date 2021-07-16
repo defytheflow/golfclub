@@ -6,6 +6,8 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import { makeStyles } from '@material-ui/core/styles';
+import BlockIcon from '@material-ui/icons/Block';
+import BeenhereIcon from '@material-ui/icons/Beenhere';
 
 interface MyIconButtonProps extends IconButtonProps {
   iconStyle?: React.CSSProperties;
@@ -67,6 +69,26 @@ export function RefreshButton({ iconStyle, ...rest }: MyIconButtonProps) {
     <Tooltip title='Обновить'>
       <IconButton color='primary' component='button' {...rest}>
         <RefreshIcon style={iconStyle} />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
+export function CancelButton({ iconStyle, ...rest }: MyIconButtonProps) {
+  return (
+    <Tooltip title='Отменить'>
+      <IconButton color='secondary' component='button' {...rest}>
+        <BlockIcon style={iconStyle} />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
+export function ClearButton({ style, ...rest }: MyIconButtonProps) {
+  return (
+    <Tooltip title='Очистить'>
+      <IconButton style={{ ...style, color: 'green' }} {...rest}>
+        <BeenhereIcon />
       </IconButton>
     </Tooltip>
   );

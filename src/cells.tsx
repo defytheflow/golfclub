@@ -14,8 +14,8 @@ interface CellProps {
   field: keyof Row;
   edited: boolean;
   disabled: boolean;
-  onBlur: (e: React.FocusEvent, row: Row) => void;
-  onChange: (e: React.ChangeEvent, row: Row) => void;
+  onBlur: (e: React.FocusEvent<HTMLInputElement>, row: Row) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>, row: Row) => void;
   onClick: (id: Row['_id'], field: keyof Row) => void;
 }
 
@@ -48,6 +48,10 @@ export const Cell = React.memo((props: CellProps) => {
     setInputValue(value);
   }
 
+  React.useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
   return (
     <TableCell align={field === 'name' ? 'left' : 'center'}>
       {edited ? (
@@ -58,7 +62,7 @@ export const Cell = React.memo((props: CellProps) => {
           onChange={callAll(handleChange, e => onChange(e, row))}
           onBlur={callAll(
             e => setInputValue(cleanValue(e.target.name as keyof Row, e.target.value)),
-            e => onBlur(e, row)
+            e => onBlur(e as React.FocusEvent<HTMLInputElement>, row)
           )}
           style={{ maxWidth: 'fit-content', minWidth: '100%' }}
           select={field === 'gender'}>
@@ -90,7 +94,7 @@ export function PercentCell({ row, column }: PercentCellProps) {
   const hiNumber = Number(row.hi);
   return (
     <TableCell align='center'>
-      {isNaN(hiNumber) || row.hi === ''
+      {isNaN(hiNumber) || row.hi === '' || column.percent === undefined
         ? '-'
         : ((hiNumber * column.percent) / 100).toFixed(2)}
     </TableCell>

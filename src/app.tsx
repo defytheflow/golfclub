@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import axios from 'axios';
+import axios, { CancelTokenSource } from 'axios';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,15 +9,30 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
-import Modal, { ModalProps } from '@material-ui/core/Modal';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import WarningIcon from '@material-ui/icons/Warning';
 
-import { AddButton, DeleteButton, RefreshButton } from './buttons';
+import {
+  AddButton,
+  CancelButton,
+  ClearButton,
+  DeleteButton,
+  RefreshButton,
+} from './buttons';
 import { Cell, PercentCell, PercentHeader } from './cells';
+import { ErrorModal, HelpModal } from './modals';
 import { Row, Column, User, DBAction } from './types';
-import { cleanValue, sum, sortedIndex } from './utils';
+import {
+  cleanValue,
+  sum,
+  sortedIndex,
+  createRow,
+  createColumn,
+  // useReducerLogger,
+} from './utils';
 
 type EditedCell = {
   id: Row['_id'] | Column['_id'] | null;
@@ -26,14 +41,24 @@ type EditedCell = {
 
 type HistoryEntry = (Row & { type: 'row' }) | (Column & { type: 'column' });
 
+type ModalState = {
+  type: null | 'help' | 'error';
+  message?: string;
+};
+
+type FetchingEntry = {
+  id: Row['_id'];
+  status: 'loading' | 'error';
+};
+
 type TableState = {
   rows: Row[];
   columns: Column[];
   history: HistoryEntry[];
-  fetching: Array<Row['_id']>;
+  fetching: FetchingEntry[];
   editedCell: EditedCell;
   status: 'idle' | 'loading';
-  showHelp: boolean;
+  modal: ModalState;
   user: User;
 };
 
@@ -41,12 +66,14 @@ type TableAction =
   | DBAction
   | { type: 'edit_cell'; payload: EditedCell }
   | { type: 'undo' }
-  | { type: 'show_help' }
-  | { type: 'close_help' }
+  | { type: 'open_modal'; payload: ModalState }
+  | { type: 'close_modal' }
   | { type: 'fetch_row'; payload: Row['_id'] }
   | { type: 'fetch_rows'; payload: number }
   | { type: 'resolve_row'; payload: Row['_id'] }
-  | { type: 'reject_row'; payload: Row['_id'] };
+  | { type: 'resolve_rows' }
+  | { type: 'reject_row'; payload: Row['_id'] }
+  | { type: 'reject_rows' };
 
 function tableReducer(state: TableState, action: TableAction): TableState {
   switch (action.type) {
@@ -55,7 +82,7 @@ function tableReducer(state: TableState, action: TableAction): TableState {
         ...state,
         ...action.payload,
         status: 'idle',
-        showHelp: action.payload.user.showHelp,
+        modal: action.payload?.user.showHelp ? { type: 'help' } : state.modal,
       };
     }
     case 'insert_row': {
@@ -68,7 +95,9 @@ function tableReducer(state: TableState, action: TableAction): TableState {
     case 'update_row': {
       const { _id, ...data } = action.payload;
       const rows = state.rows.map(row => (row._id === _id ? { ...row, ...data } : row));
-      return { ...state, editedCell: { id: null, field: null }, rows };
+      const editedCell =
+        _id === state.editedCell.id ? { id: null, field: null } : state.editedCell;
+      return { ...state, editedCell, rows };
     }
     case 'remove_row': {
       const rowIndex = state.rows.findIndex(row => row._id === action.payload);
@@ -119,31 +148,56 @@ function tableReducer(state: TableState, action: TableAction): TableState {
     case 'undo': {
       return { ...state, history: state.history.slice(0, -1) };
     }
-    case 'show_help': {
-      return { ...state, showHelp: true };
+    case 'open_modal': {
+      return { ...state, modal: action.payload };
     }
-    case 'close_help': {
-      return { ...state, showHelp: false };
+    case 'close_modal': {
+      return { ...state, modal: { type: null } };
     }
     case 'update_user': {
       return { ...state, user: action.payload };
     }
     case 'fetch_row': {
-      return { ...state, fetching: [...state.fetching, action.payload] };
+      return {
+        ...state,
+        fetching: [...state.fetching, { id: action.payload, status: 'loading' }],
+      };
     }
     case 'fetch_rows': {
       return {
         ...state,
-        fetching: state.rows.slice(0, action.payload).map(row => row._id),
+        fetching: state.rows
+          .slice(0, action.payload)
+          .filter(row => row.number)
+          .map(row => ({ id: row._id, status: 'loading' })),
       };
     }
     case 'resolve_row': {
-      // do extra stuff.
-      return { ...state, fetching: state.fetching.filter(id => id !== action.payload) };
+      return {
+        ...state,
+        fetching: state.fetching.filter(entry => entry.id !== action.payload),
+      };
+    }
+    case 'resolve_rows': {
+      return { ...state, fetching: [] };
     }
     case 'reject_row': {
-      // do extra stuff.
-      return { ...state, fetching: state.fetching.filter(id => id !== action.payload) };
+      const index = state.fetching.findIndex(entry => entry.id === action.payload);
+      return {
+        ...state,
+        fetching: [
+          ...state.fetching.slice(0, index),
+          { ...state.fetching[index], status: 'error' },
+          ...state.fetching.slice(index + 1),
+        ],
+      };
+    }
+    case 'reject_rows': {
+      return {
+        ...state,
+        fetching: [],
+        modal: { type: 'error', message: 'Сайт недоступен' },
+      };
     }
   }
 }
@@ -157,33 +211,31 @@ const useTableStyles = makeStyles({
   },
 });
 
-// TODO: add cancel refresh on second refresh click.
 // TODO: horizontal scroll when a lot of columns.
-// TODO: add ctr+f like in firefox.
-// TODO: fix bug can not update fields while refreshing.
-// TODO: fix empty rows shouuld not load and display spinner.
 function App() {
-  const [state, dispatch] = React.useReducer(tableReducer, {
-    rows: [],
-    columns: [],
-    history: [],
-    fetching: [],
-    editedCell: { id: null, field: null },
-    status: 'loading',
-    showHelp: false,
-    user: { showHelp: false },
-  });
+  const [state, dispatch] =
+    // useReducerLogger(
+    React.useReducer(tableReducer, {
+      rows: [],
+      columns: [],
+      history: [],
+      fetching: [],
+      editedCell: { id: null, field: null },
+      status: 'loading',
+      modal: { type: null, message: '' },
+      user: { showHelp: false },
+    });
+  // );
 
-  const { rows, columns, fetching, editedCell, status, showHelp, user } = state;
+  const { rows, columns, fetching, editedCell, status, modal, user } = state;
   const tableWidth = sum(columns.map(column => column.width));
   const percentColumns = columns.filter(column => 'percent' in column);
-  const columnNames = ['number', 'name', 'gender', 'hi'] as Array<
-    Exclude<keyof Row, 'order'>
-  >;
+  const columnNames: Exclude<keyof Row, 'order'>[] = ['number', 'name', 'gender', 'hi'];
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const runScrollEffectRef = React.useRef(false);
   const removedRowInProcessRef = React.useRef<string | null>(null);
+  const cancelTokenRef = React.useRef<CancelTokenSource | null>(null);
 
   React.useEffect(() => {
     window.api.send('toMain', { type: 'load' });
@@ -195,11 +247,11 @@ function App() {
       const lastEntry = state.history.slice(-1)[0];
 
       if (lastEntry.type === 'row') {
-        delete lastEntry.type;
-        window.api.send('toMain', { type: 'insert_row', payload: lastEntry });
+        const { type: _, ...lastRow } = lastEntry; // eslint-disable-line
+        window.api.send('toMain', { type: 'insert_row', payload: lastRow });
       } else if (lastEntry.type === 'column') {
-        delete lastEntry.type;
-        window.api.send('toMain', { type: 'insert_column', payload: lastEntry });
+        const { type: _, ...lastColumn } = lastEntry; // eslint-disable-line
+        window.api.send('toMain', { type: 'insert_column', payload: lastColumn });
       }
 
       dispatch({ type: 'undo' });
@@ -211,13 +263,13 @@ function App() {
         ((e.ctrlKey && window.platform !== 'darwin') ||
           (e.metaKey && window.platform === 'darwin'))
       ) {
-        if (state.editedCell.id === null && state.history.length) undo();
+        if (editedCell.id === null && state.history.length) undo();
       }
     }
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [state.editedCell.id, state.history]);
+  }, [editedCell.id, state.history]);
 
   React.useEffect(() => {
     if (columns.length) {
@@ -229,28 +281,52 @@ function App() {
   }, [columns.length]);
 
   async function refresh() {
-    const count = rows.length;
+    // const count = 10;
+    const count = state.rows.length;
     dispatch({ type: 'fetch_rows', payload: count });
 
-    // super cool errors cna happen here...
     const parser = new DOMParser();
-    const res = await axios.get('https://hcp.rusgolf.ru/public/player/ru/');
-    const html = parser.parseFromString(res.data, 'text/html');
-    const csrfToken = (html.querySelector('#form__token') as HTMLInputElement).value;
+    let csrfToken: string | null = null;
 
-    // console.time('timer');
+    cancelTokenRef.current = axios.CancelToken.source();
+
+    try {
+      const res = await axios.get('https://hcp.rusgolf.ru/public/player/ru/', {
+        cancelToken: cancelTokenRef.current.token,
+      });
+      const html = parser.parseFromString(res.data, 'text/html');
+      const tokenInput = html.querySelector('#form__token') as HTMLInputElement | null;
+      if (tokenInput) {
+        csrfToken = tokenInput.value;
+      }
+    } catch (err) {
+      if (axios.isCancel(err)) {
+        dispatch({ type: 'resolve_rows' });
+      } else {
+        console.error(err.message);
+        dispatch({ type: 'reject_rows' });
+      }
+      return;
+    }
+
+    if (!csrfToken) {
+      console.error("Couldn't find a csrf token element on the page.");
+      dispatch({ type: 'reject_rows' });
+      return;
+    }
+
+    let hasBeenCancelled = false;
     for (const row of rows.slice(0, count)) {
-      // dispatch({ type: 'fetch_row', payload: row._id });
       if (!row.number) {
         return;
       }
-
       axios
         .get('https://hcp.rusgolf.ru/public/player/ru/', {
           params: {
             'form[search]': 'RU' + row.number,
             'form[_token]': csrfToken,
           },
+          cancelToken: cancelTokenRef.current.token,
         })
         .then(res => {
           const html = parser.parseFromString(res.data, 'text/html');
@@ -271,21 +347,26 @@ function App() {
             });
 
             dispatch({ type: 'resolve_row', payload: row._id });
-            // console.log(tr.innerText.replace(/\s+/g, ''));
           } else {
             dispatch({ type: 'reject_row', payload: row._id });
           }
         })
         .catch(err => {
-          if (axios.isAxiosError(err)) {
-            dispatch({ type: 'reject_row', payload: row._id });
+          if (axios.isCancel(err)) {
+            if (!hasBeenCancelled) {
+              dispatch({ type: 'resolve_rows' });
+              hasBeenCancelled = true;
+            }
+          } else {
+            console.error(err.message);
+            dispatch({ type: 'reject_rows' });
           }
         });
     }
   }
 
   function insertRow() {
-    const prevOrder = rows[rows.length - 1].order;
+    const prevOrder = rows.length > 0 ? rows[rows.length - 1].order : 0;
     window.api.send('toMain', {
       type: 'insert_row',
       payload: createRow(prevOrder + 1, '', '', '', ''),
@@ -297,7 +378,7 @@ function App() {
       return;
     }
     window.api.send('toMain', { type: 'remove_row', payload: rowID });
-    removedRowInProcessRef.current = rowID;
+    removedRowInProcessRef.current = rowID as string;
   }
 
   function insertColumn() {
@@ -311,7 +392,7 @@ function App() {
   function updateColumn(columnID: Column['_id'], value: number) {
     const column = columns.find(column => column._id === columnID);
 
-    if (column.percent !== value) {
+    if (column && column.percent !== value) {
       window.api.send('toMain', {
         type: 'update_column',
         payload: { ...column, percent: value },
@@ -370,67 +451,38 @@ function App() {
     );
   }
 
+  const isFetching = fetching.some(entry => entry.status === 'loading');
+  const isError = fetching.some(entry => entry.status === 'error');
+
   return (
     <>
       <HelpModal
-        open={showHelp}
-        onClose={() => dispatch({ type: 'close_help' })}
-        onInputChange={value => {
-          window.api.send('toMain', {
-            type: 'update_user',
-            payload: { ...user, showHelp: !value },
-          });
-          dispatch({ type: 'close_help' });
+        open={modal.type === 'help'}
+        onClose={() => dispatch({ type: 'close_modal' })}
+        defaultChecked={!user.showHelp}
+        onCheck={value => {
+          // prettier-ignore
+          window.api.send('toMain', { type: 'update_user', payload: { ...user, showHelp: !value } });
+          dispatch({ type: 'close_modal' });
         }}
-        checked={!user.showHelp}
       />
-      <div style={{ display: 'flex' }}>
-        <ul
+      <ErrorModal
+        open={modal.type === 'error'}
+        onClose={() => dispatch({ type: 'close_modal' })}
+        message={modal.message as string}
+      />
+      {!isFetching && isError && (
+        <ClearButton
           style={{
-            listStyleType: 'none',
-            padding: 0,
-            marginTop: 52,
-            width: 40,
-          }}>
-          {rows.map(row => {
-            const isFetching = fetching.some(id => id === row._id);
-            const isAnyFetching = fetching.length > 0;
-
-            if (isFetching) {
-              return (
-                <li
-                  key={row._id}
-                  style={{
-                    height: 45,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '0.5rem',
-                    marginLeft: '0.5rem',
-                  }}>
-                  <CircularProgress style={{ height: 15, width: 15 }} />
-                </li>
-              );
-            }
-
-            if (isAnyFetching) {
-              return (
-                <li
-                  key={row._id}
-                  style={{
-                    height: 45,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '0.5rem',
-                    marginLeft: '0.5rem',
-                  }}></li>
-              );
-            }
-
-            return null;
-          })}
-        </ul>
+            position: 'absolute',
+            top: '2.55rem',
+            left: '0.2rem',
+          }}
+          onClick={() => dispatch({ type: 'resolve_rows' })}
+        />
+      )}
+      <div style={{ display: 'flex' }}>
+        <LoadingBar rows={rows} fetching={fetching} />
         <TableContainer
           component={Paper}
           className={classes.container}
@@ -464,13 +516,19 @@ function App() {
                     iconStyle={{ width: 29, height: 29 }}
                     onClick={insertColumn}
                   />
-                  <RefreshButton onClick={refresh} />
+                  {isFetching ? (
+                    <CancelButton onClick={() => cancelTokenRef.current?.cancel()} />
+                  ) : (
+                    <RefreshButton onClick={refresh} />
+                  )}
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((row, i) => {
-                const isRowDisabled = fetching.some(id => id === row._id);
+                const isRowDisabled = fetching.some(
+                  entry => entry.id === row._id && entry.status === 'loading'
+                );
                 return (
                   <TableRow key={row._id}>
                     <TableCell align='center'>{i + 1}</TableCell>
@@ -480,7 +538,7 @@ function App() {
                           key={field}
                           row={row}
                           field={field as keyof Row}
-                          value={row[field]}
+                          value={row[field] as string}
                           edited={editedCell.id === row._id && editedCell.field === field}
                           disabled={isRowDisabled}
                           onBlur={handleBlur}
@@ -503,7 +561,12 @@ function App() {
         </TableContainer>
       </div>
       <div
-        style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '0.5rem',
+          marginLeft: 40,
+        }}
         className={classes.container}>
         <AddButton iconStyle={{ width: 35, height: 35 }} onClick={insertRow} />
       </div>
@@ -511,67 +574,54 @@ function App() {
   );
 }
 
-interface HelpModalProps extends Omit<ModalProps, 'children'> {
-  checked: boolean;
-  onInputChange: (value: boolean) => void;
-}
+const useLoadingBarStyles = makeStyles({
+  root: {
+    listStyleType: 'none',
+    padding: 0,
+    marginTop: 55,
+    width: 40,
+  },
+  item: {
+    height: 47,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: '0.5rem',
+    marginLeft: '0.5rem',
+  },
+});
 
-function HelpModal({ checked, onInputChange, onClose, ...rest }: HelpModalProps) {
-  const [isChecked, setChecked] = React.useState(checked);
+function LoadingBar({ rows, fetching }: Pick<TableState, 'rows' | 'fetching'>) {
+  const classes = useLoadingBarStyles();
   return (
-    <Modal
-      {...rest}
-      onClose={(event, reason) => {
-        if (isChecked !== checked) {
-          onInputChange(isChecked);
+    <ul className={classes.root}>
+      {rows.map(row => {
+        const entry = fetching.find(entry => entry.id === row._id);
+
+        const isLoading = entry?.status === 'loading';
+        const isError = entry?.status === 'error';
+        const isAnyLoadingOrError = fetching.length > 0;
+
+        if (!(isLoading || isError || isAnyLoadingOrError)) {
+          return null;
         }
-        onClose(event, reason);
-      }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <div
-        style={{
-          backgroundColor: 'white',
-          padding: 20,
-          borderRadius: 5,
-          outline: 0,
-        }}>
-        <h1>Инструкция</h1>
-        <p>...</p>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-          }}>
-          <input
-            id='show-help'
-            type='checkbox'
-            onChange={e => setChecked(e.target.checked)}
-            checked={isChecked}
-          />
-          <label htmlFor='show-help'>Больше не показывать</label>
-        </div>
-      </div>
-    </Modal>
+
+        return (
+          <li key={row._id} className={classes.item}>
+            {isLoading ? (
+              <CircularProgress style={{ height: 15, width: 15 }} />
+            ) : isError ? (
+              <Tooltip title='Не найден'>
+                <WarningIcon style={{ height: 20, width: 20, color: 'orange' }} />
+              </Tooltip>
+            ) : (
+              <React.Fragment />
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
-}
-
-function createRow(
-  order: number,
-  number: string,
-  name: string,
-  gender: string,
-  hi: string
-) {
-  return { order, number, name, gender, hi };
-}
-
-function createColumn(order: number, width: number, percent?: number) {
-  return { order, width, ...(percent && { percent }) };
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));

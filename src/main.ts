@@ -195,7 +195,10 @@ const template = [
       {
         label: 'Инструкция',
         click() {
-          win.webContents.send('fromMain', { type: 'show_help' });
+          win.webContents.send('fromMain', {
+            type: 'open_modal',
+            payload: { type: 'help' },
+          });
         },
       },
     ],
