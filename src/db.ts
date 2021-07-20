@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { app } from 'electron';
 import Datastore from 'nedb-promises';
 
-// import log from './logging';
+import log from './logging';
 import { Row } from './types';
 
 function dbFactory(filename: string, options = {}) {
@@ -20,8 +20,8 @@ function loadPlayers() {
 
   const players: Row[] = [];
   const csvPath = path.join(resourcesPath, 'players.csv');
-  // log('csvPath is', csvPath);
-  const lines = readFileSync(csvPath, 'utf8').split('\r\n');
+  log('csvPath is', csvPath);
+  const lines = readFileSync(csvPath, 'utf8').split(/[\n\r]/);
 
   for (let i = 1; i < lines.length - 1; i++) {
     const line = lines[i].split(';').map(word => word.trim());
